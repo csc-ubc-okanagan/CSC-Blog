@@ -15,3 +15,9 @@ url = "https://github.com/csc-ubc-okanagan"
 [social.params]
 icon = "brand-github"
 
+[[social]]
+identifier = "email"
+name = "Email"
+url = "cbc.ok@ubc.ca"
+
+
