@@ -1,0 +1,350 @@
+---
+title: Python Data Types
+date: '2023-06-15 09:00:00 -0800'
+categories: [Python, P_Getting Started]
+tags: [python] # tags always lowercase
+author: Madison
+output: 
+  html_document:
+    keep_md: TRUE
+---
+
+
+
+<p>When we talk about data, we can talk about data types, data classes, and data structures.</p>
+<p>Data types are fundamental building blocks for storing information. Below, we can see a chart of all of the datatypes in Python.</p>
+<table>
+<colgroup>
+<col width="22%" />
+<col width="27%" />
+<col width="27%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><span style="color:lightBlue">English name</span></th>
+<th align="center"><span style="color:lightBlue">Type name</span></th>
+<th align="center"><span style="color:lightBlue">Description</span></th>
+<th align="right"><span style="color:lightBlue">Example</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">integer</td>
+<td align="center"><strong>int</strong></td>
+<td align="center">positive/negative whole numbers</td>
+<td align="right"><span style="color:green">13</span></td>
+</tr>
+<tr class="even">
+<td align="left">floating point number</td>
+<td align="center"><strong>float</strong></td>
+<td align="center">real number in decimal form</td>
+<td align="right"><span style="color:green">3.1415</span></td>
+</tr>
+<tr class="odd">
+<td align="left">boolean</td>
+<td align="center"><strong>bool</strong></td>
+<td align="center">true or false</td>
+<td align="right"><span style="color:green">True</span></td>
+</tr>
+<tr class="even">
+<td align="left">string</td>
+<td align="center"><strong>str</strong></td>
+<td align="center">text</td>
+<td align="right"><span style="color:green">“Do you like Python?”</span></td>
+</tr>
+<tr class="odd">
+<td align="left">list</td>
+<td align="center"><strong>list</strong></td>
+<td align="center">a collection of objects - mutable &amp; ordered</td>
+<td align="right"><span style="color:green">[‘Hi’,‘Hello’,‘Hola’]</span></td>
+</tr>
+<tr class="even">
+<td align="left">tuple</td>
+<td align="center"><strong>tuple</strong></td>
+<td align="center">a collection of objects - immutable &amp; ordered</td>
+<td align="right"><span style="color:green">(‘Tuesday’,3,14,2023)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">dictionary</td>
+<td align="center"><strong>dict</strong></td>
+<td align="center">mapping of key-value pairs</td>
+<td align="right"><span style="color:green">{‘name’:‘Madison’,‘Program’:‘Data Science’,‘Age’:23}</span></td>
+</tr>
+<tr class="even">
+<td align="left">none</td>
+<td align="center"><strong>NoneType</strong></td>
+<td align="center">represents no value</td>
+<td align="right"><span style="color:green">None</span></td>
+</tr>
+</tbody>
+</table>
+<p>Note that character data, also known as strings, are always wrapped in “quotation marks”. You can use single quotes like ‘this’ or double quotes like “this”. As long as you use two of the same, it doesn’t matter which you use!</p>
+<p>We can use the function <code>type()</code> to view the datatype of the stored value in a variable. Let’s explore a few examples of this.</p>
+<pre class="python"><code># Datatype 
+x = 1 + 1
+type(x)</code></pre>
+<pre><code>## &lt;class &#39;int&#39;&gt;</code></pre>
+<pre class="python"><code>x = 2.0
+type(x)</code></pre>
+<pre><code>## &lt;class &#39;float&#39;&gt;</code></pre>
+<pre class="python"><code># String
+string = &#39;Okanagan&#39;
+print(string)</code></pre>
+<pre><code>## Okanagan</code></pre>
+<pre class="python"><code>type(x)</code></pre>
+<pre><code>## &lt;class &#39;float&#39;&gt;</code></pre>
+<div id="comparison-operators" class="section level2">
+<h2>Comparison Operators</h2>
+<p>We can compare objects (or variables) using comparison operators. The result is a Boolean value. Recall from above that a Boolean gives either a True or False.</p>
+<p>First, let’s look at a table of the different comparison operators.</p>
+<div id="comparison-operators-1" class="section level4">
+<h4>Comparison Operators</h4>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><span style="color:blue">Operator</span></th>
+<th align="left"><span style="color:blue">Description</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span style="color:green">x == y</span></td>
+<td align="left">is <span style="color:green">x</span> equal to <span style="color:green">y</span>?</td>
+</tr>
+<tr class="even">
+<td align="left"><span style="color:green">x != y</span></td>
+<td align="left">is <span style="color:green">x</span> not equal to <span style="color:green">y</span>?</td>
+</tr>
+<tr class="odd">
+<td align="left"><span style="color:green">x &gt; y</span></td>
+<td align="left">is <span style="color:green">x</span> greater than <span style="color:green">y</span>?</td>
+</tr>
+<tr class="even">
+<td align="left"><span style="color:green">x &gt;= y</span></td>
+<td align="left">is <span style="color:green">x</span> greater than or equal to <span style="color:green">y</span>?</td>
+</tr>
+<tr class="odd">
+<td align="left"><span style="color:green">x &lt; y</span></td>
+<td align="left">is <span style="color:green">x</span> less than <span style="color:green">y</span>?</td>
+</tr>
+<tr class="even">
+<td align="left"><span style="color:green">x &lt;= y</span></td>
+<td align="left">is <span style="color:green">x</span> less than or equal to <span style="color:green">y</span>?</td>
+</tr>
+<tr class="odd">
+<td align="left"><span style="color:green">x is y</span></td>
+<td align="left">is <span style="color:green">x</span> the same object as <span style="color:green">y</span>?</td>
+</tr>
+<tr class="even">
+<td align="left"><span style="color:green">x and y</span></td>
+<td align="left">are <span style="color:green">x</span> and <span style="color:green">y</span> both true?</td>
+</tr>
+<tr class="odd">
+<td align="left"><span style="color:green">x or y</span></td>
+<td align="left">is at least one of <span style="color:green">x</span> and <span style="color:green">y</span> true?</td>
+</tr>
+<tr class="even">
+<td align="left"><span style="color:green">not x</span></td>
+<td align="left">is <span style="color:green">x</span> false?</td>
+</tr>
+</tbody>
+</table>
+<p>Now, let’s look at a few examples.</p>
+<pre class="python"><code>5 &lt; 7</code></pre>
+<pre><code>## True</code></pre>
+<pre class="python"><code>five = 5
+seven = 7
+five &lt; seven</code></pre>
+<pre><code>## True</code></pre>
+<pre class="python"><code>5.0 == 5</code></pre>
+<pre><code>## True</code></pre>
+<pre class="python"><code>5.0 == &#39;5&#39;</code></pre>
+<pre><code>## False</code></pre>
+</div>
+</div>
+<div id="lists" class="section level2">
+<h2>Lists</h2>
+<p>Lists are an important tool used in Python. Lists can contain elements of mixed types as well. Let’s look at a few examples.</p>
+<pre class="python"><code># List
+list1 = []
+list1</code></pre>
+<pre><code>## []</code></pre>
+<pre class="python"><code>list2 = [1, &#39;UBC&#39;, 100]
+list2</code></pre>
+<pre><code>## [1, &#39;UBC&#39;, 100]</code></pre>
+<p>Now let’s see a few operations we can perform on a list.</p>
+<pre class="python"><code>len(list1)</code></pre>
+<pre><code>## 0</code></pre>
+<pre class="python"><code>len(list2)</code></pre>
+<pre><code>## 3</code></pre>
+<pre class="python"><code># Indexing Example - we will talk more about this later on
+list2[2]</code></pre>
+<pre><code>## 100</code></pre>
+<p>Note - Python indexing starts at zero, so the first element in the list is 0, the second is 1, and the third is 2, so if we actually wanted the second element, we would have to do this:</p>
+<pre class="python"><code>list2[1]</code></pre>
+<pre><code>## &#39;UBC&#39;</code></pre>
+<pre class="python"><code>type(list2)</code></pre>
+<pre><code>## &lt;class &#39;list&#39;&gt;</code></pre>
+<pre class="python"><code>type(list2[1])</code></pre>
+<pre><code>## &lt;class &#39;str&#39;&gt;</code></pre>
+<p>As we mentioned earlier, a main difference between lists and tuples is that lists are mutable. Mutable means that elements in a list can be appended, changed, or deleted.</p>
+<pre class="python"><code>mixed_list = [1, &#39;UBC&#39;, 5.0, &#39;1&#39;]
+mixed_list.append(&#39;New&#39;)
+mixed_list</code></pre>
+<pre><code>## [1, &#39;UBC&#39;, 5.0, &#39;1&#39;, &#39;New&#39;]</code></pre>
+<p>If we decided that we wanted to replace ‘New’ with 4, we could do so like this:</p>
+<pre class="python"><code>mixed_list[4]= 4
+mixed_list</code></pre>
+<pre><code>## [1, &#39;UBC&#39;, 5.0, &#39;1&#39;, 4]</code></pre>
+<p>If we wanted to remove elements from the list, we could do so like this:</p>
+<pre class="python"><code>mixed_list.remove(&#39;UBC&#39;)
+mixed_list</code></pre>
+<pre><code>## [1, 5.0, &#39;1&#39;, 4]</code></pre>
+<p>Note that this will only remove the first occurrence, if this happened to be in the list more than once. It would also call an error message if the element doesn’t exist.</p>
+<p>If we wanted to remove it based on the index of the list:</p>
+<pre class="python"><code>del mixed_list[0]
+mixed_list</code></pre>
+<pre><code>## [5.0, &#39;1&#39;, 4]</code></pre>
+</div>
+<div id="dictionaries" class="section level2">
+<h2>Dictionaries</h2>
+<p>A dictionary lists key-value pairs, which could also be thought of as associated values where a key matches to the associated value. Let’s look at a few examples.</p>
+<pre class="python"><code># Dictionary - mapping between values
+house = {&#39;bedrooms&#39;: 3, &#39;bathrooms&#39;: 2, 
+         &#39;city&#39;: &#39;Kelowna&#39;, &#39;price&#39;: 250000}</code></pre>
+<pre class="python"><code>house[&#39;price&#39;]</code></pre>
+<pre><code>## 250000</code></pre>
+<pre class="python"><code>course = {&#39;Data Science&#39;: [&#39;DATA100&#39;, &#39;DATA200&#39;, &#39;DATA300&#39;],
+            &#39;Science&#39;: [&#39;SCIENCE100&#39;, &#39;SCIENCE200&#39;, &#39;SCIENCE300&#39;]}</code></pre>
+<pre class="python"><code>course[&#39;Data Science&#39;]</code></pre>
+<pre><code>## [&#39;DATA100&#39;, &#39;DATA200&#39;, &#39;DATA300&#39;]</code></pre>
+</div>
+<div id="loops" class="section level2">
+<h2>Loops</h2>
+<p>Loops are a common tool used in Python to help users iterate through lists, or perform the same operation numerous times without added efforts.</p>
+<p>Let’s look at a few examples:</p>
+<pre class="python"><code># Loops
+
+for n in [0, 1, 5, 2, -5]:
+    # this is inside the loop
+    print(&quot;The number is&quot;, n, &quot;and its squared value is&quot;, n**2)</code></pre>
+<pre><code>## The number is 0 and its squared value is 0
+## The number is 1 and its squared value is 1
+## The number is 5 and its squared value is 25
+## The number is 2 and its squared value is 4
+## The number is -5 and its squared value is 25</code></pre>
+<pre class="python"><code># this is outside the loop</code></pre>
+<pre class="python"><code>## Loop
+s = &quot;Python&quot;
+for c in s:
+    print(c + &quot;!&quot;)</code></pre>
+<pre><code>## P!
+## y!
+## t!
+## h!
+## o!
+## n!</code></pre>
+<pre class="python"><code># range(10) sets values 0-9, because recall Python starts at 0, not 1
+for i in range(10):
+    print(i)</code></pre>
+<pre><code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9</code></pre>
+<p>This is equivalent to writing:</p>
+<pre class="python"><code>for i in range(0,10):
+    print(i)</code></pre>
+<pre><code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9</code></pre>
+<p>If we wanted it to start at 1 and go to 10 (inclusive), we would write:</p>
+<pre class="python"><code>for i in range(1,11):
+    print(i)</code></pre>
+<pre><code>## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9
+## 10</code></pre>
+<p>Other examples:</p>
+<pre class="python"><code>#(start,end,increments)
+for i in range(0,101,10):
+    print(i)</code></pre>
+<pre><code>## 0
+## 10
+## 20
+## 30
+## 40
+## 50
+## 60
+## 70
+## 80
+## 90
+## 100</code></pre>
+<pre class="python"><code>n = 3
+while n &gt; 0:
+    print(n)
+    n = n - 1</code></pre>
+<pre><code>## 3
+## 2
+## 1</code></pre>
+<pre class="python"><code>print(&quot;Smile!&quot;)</code></pre>
+<pre><code>## Smile!</code></pre>
+</div>
+<div id="data-frames" class="section level2">
+<h2>Data Frames</h2>
+<p>A data frame essentially functions as a series of connected vectors or lists, where each vector or list is a column. In this sense a data frame is also a special kind of list.</p>
+<p>In a data frame, all vectors need to be of the same length. And while each vector must hold the same data type, not all vectors need to be of the same data type. Data frames also allow us to apply column names.</p>
+<p>Let’s look at an example of creating a dataframe from two lists.</p>
+<pre class="python"><code>letter_list = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;, &#39;f&#39;, &#39;g&#39;, &#39;h&#39;, &#39;i&#39;]
+number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+import pandas as pd
+df = pd.DataFrame(
+    {&#39;Letters&#39;: letter_list,
+     &#39;Numbers&#39;: number_list})
+
+df</code></pre>
+<pre><code>##   Letters  Numbers
+## 0       a        1
+## 1       b        2
+## 2       c        3
+## 3       d        4
+## 4       e        5
+## 5       f        6
+## 6       g        7
+## 7       h        8
+## 8       i        9</code></pre>
+<p>Alternatively, you could write a data frame directly like this:</p>
+<pre class="python"><code>df1 = pd.DataFrame({&#39;x&#39; : [1., 2., 3., 4.],
+                   &#39;y&#39; : [4., 3., 2., 1.],
+                   &#39;z&#39; : [1, 2, 3, 4]})
+df1</code></pre>
+<pre><code>##      x    y  z
+## 0  1.0  4.0  1
+## 1  2.0  3.0  2
+## 2  3.0  2.0  3
+## 3  4.0  1.0  4</code></pre>
+<p>Data frames are a VERY powerful data type in Python. We will spend most of our remaining time working with data frames because there is so much to learn about.</p>
+</div>
