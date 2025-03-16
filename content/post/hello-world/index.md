@@ -1,7 +1,6 @@
 ---
 title: Hello World
-authors:
-    - Amir Golzan
+author: "Amir Golzan"
 description: Welcome to Hugo Theme Stack
 slug: hello-world
 date: 2022-03-06 00:00:00+0000
