@@ -1,0 +1,165 @@
+---
+title: Subsetting in Python
+date: '2023-07-07 09:00:00 -0800'
+categories: [Python, P_Data]
+tags: [python] # tags always lowercase
+author: Madison
+output: 
+  html_document:
+    keep_md: TRUE
+---
+
+
+
+<p>Sometimes the data frame we are working with can be very large and take a while to process. Alternatively, we could only need a portion of the information. There is a way to filter through a data frame such that only the specified information is used, which saves space and time!</p>
+<p>Let’s re-load in our Gapminder data:</p>
+<pre class="python"><code>import pandas as pd
+url = &#39;https://raw.githubusercontent.com/jstaf/gapminder/master/gapminder/gapminder.csv&#39;
+df = pd.read_csv(url)</code></pre>
+<p>We know that we can select just one column like this below:</p>
+<pre class="python"><code>df[&#39;country&#39;]</code></pre>
+<pre><code>## 0       Afghanistan
+## 1       Afghanistan
+## 2       Afghanistan
+## 3       Afghanistan
+## 4       Afghanistan
+##            ...     
+## 1699       Zimbabwe
+## 1700       Zimbabwe
+## 1701       Zimbabwe
+## 1702       Zimbabwe
+## 1703       Zimbabwe
+## Name: country, Length: 1704, dtype: object</code></pre>
+<p>So if we wanted to create a new data frame by filtering our existing data frame for entries where the country column has the value ‘Canada’, we can do so like this:</p>
+<pre class="python"><code>df_2 = df[df[&#39;country&#39;] == &#39;Canada&#39;]
+df_2.head()</code></pre>
+<pre><code>##     country continent  year  lifeExp       pop    gdpPercap
+## 240  Canada  Americas  1952    68.75  14785584  11367.16112
+## 241  Canada  Americas  1957    69.96  17010154  12489.95006
+## 242  Canada  Americas  1962    71.30  18985849  13462.48555
+## 243  Canada  Americas  1967    72.13  20819767  16076.58803
+## 244  Canada  Americas  1972    72.88  22284500  18970.57086</code></pre>
+<p>Alternatively, if we didn’t want to create a new data frame, but we wanted to view just a subset of the data frame temporarily, we could write this:</p>
+<pre class="python"><code>cols = [&#39;country&#39;, &#39;continent&#39;, &#39;pop&#39;]
+df[cols]</code></pre>
+<pre><code>##           country continent       pop
+## 0     Afghanistan      Asia   8425333
+## 1     Afghanistan      Asia   9240934
+## 2     Afghanistan      Asia  10267083
+## 3     Afghanistan      Asia  11537966
+## 4     Afghanistan      Asia  13079460
+## ...           ...       ...       ...
+## 1699     Zimbabwe    Africa   9216418
+## 1700     Zimbabwe    Africa  10704340
+## 1701     Zimbabwe    Africa  11404948
+## 1702     Zimbabwe    Africa  11926563
+## 1703     Zimbabwe    Africa  12311143
+## 
+## [1704 rows x 3 columns]</code></pre>
+<p>We could also perform operations such as <code>.mean()</code>, <code>.median()</code>, <code>.max()</code>, etc. using filtering. An example of this can be found below.</p>
+<pre class="python"><code>cols = [&#39;lifeExp&#39;, &#39;pop&#39;, &#39;gdpPercap&#39;]
+df[cols].mean()</code></pre>
+<pre><code>## lifeExp      5.947444e+01
+## pop          2.960121e+07
+## gdpPercap    7.215327e+03
+## dtype: float64</code></pre>
+<p>We can select different row &amp; column combinations as well by indexing. If we wanted to select just the first entry in the first row and column, remembering that Python starts indexing at 0, it would look like this:</p>
+<pre class="python"><code>df.iloc[0,0]</code></pre>
+<pre><code>## &#39;Afghanistan&#39;</code></pre>
+<p><code>.iloc()</code> is a function that helps us select a particular cell in the data set. We can also use it to select the first row entirely.</p>
+<pre class="python"><code>df.iloc[0]</code></pre>
+<pre><code>## country      Afghanistan
+## continent           Asia
+## year                1952
+## lifeExp           28.801
+## pop              8425333
+## gdpPercap     779.445314
+## Name: 0, dtype: object</code></pre>
+<p>We could also use it to select the first 3 rows like this:</p>
+<pre class="python"><code>df.iloc[:3]</code></pre>
+<pre><code>##        country continent  year  lifeExp       pop   gdpPercap
+## 0  Afghanistan      Asia  1952   28.801   8425333  779.445314
+## 1  Afghanistan      Asia  1957   30.332   9240934  820.853030
+## 2  Afghanistan      Asia  1962   31.997  10267083  853.100710</code></pre>
+<p>Which is equivalent to:</p>
+<pre class="python"><code>df.iloc[0:3]</code></pre>
+<pre><code>##        country continent  year  lifeExp       pop   gdpPercap
+## 0  Afghanistan      Asia  1952   28.801   8425333  779.445314
+## 1  Afghanistan      Asia  1957   30.332   9240934  820.853030
+## 2  Afghanistan      Asia  1962   31.997  10267083  853.100710</code></pre>
+<p>If we wanted to select the first column only:</p>
+<pre class="python"><code>df.iloc[:,0]</code></pre>
+<pre><code>## 0       Afghanistan
+## 1       Afghanistan
+## 2       Afghanistan
+## 3       Afghanistan
+## 4       Afghanistan
+##            ...     
+## 1699       Zimbabwe
+## 1700       Zimbabwe
+## 1701       Zimbabwe
+## 1702       Zimbabwe
+## 1703       Zimbabwe
+## Name: country, Length: 1704, dtype: object</code></pre>
+<p>And then if we wanted to select all rows but only the second and third columns, we could do so like this:</p>
+<pre class="python"><code>df.iloc[:, 1:3]</code></pre>
+<pre><code>##      continent  year
+## 0         Asia  1952
+## 1         Asia  1957
+## 2         Asia  1962
+## 3         Asia  1967
+## 4         Asia  1972
+## ...        ...   ...
+## 1699    Africa  1987
+## 1700    Africa  1992
+## 1701    Africa  1997
+## 1702    Africa  2002
+## 1703    Africa  2007
+## 
+## [1704 rows x 2 columns]</code></pre>
+<div id="logical-subsetting" class="section level2">
+<h2>Logical Subsetting</h2>
+<p>So far, we haven’t applied many conditions to our subsets, but we can. In logical subsetting, the subset defaults to returning the results where the condition is TRUE.</p>
+<p>Recall, Python allows us to specify several conditions:</p>
+<ul>
+<li>less than &gt;</li>
+<li>greater than &lt;</li>
+<li>less than or equal to &lt;=</li>
+<li>greater than or equal &gt;=</li>
+<li>equivalent to ==</li>
+<li>not equivalent to !=</li>
+</ul>
+<p>As well as boolean operators</p>
+<ul>
+<li>or |</li>
+<li>and &amp;</li>
+</ul>
+<pre class="python"><code>df_3 = df[df[&#39;pop&#39;] &gt; 10000000] # all variables for when population is greater than 10 million
+df_3.head() </code></pre>
+<pre><code>##        country continent  year  lifeExp       pop   gdpPercap
+## 2  Afghanistan      Asia  1962   31.997  10267083  853.100710
+## 3  Afghanistan      Asia  1967   34.020  11537966  836.197138
+## 4  Afghanistan      Asia  1972   36.088  13079460  739.981106
+## 5  Afghanistan      Asia  1977   38.438  14880372  786.113360
+## 6  Afghanistan      Asia  1982   39.854  12881816  978.011439</code></pre>
+<p>If we wanted to filter by country name and year, without saving to a new data frame, we can do so like this:</p>
+<pre class="python"><code>df[(df[&#39;country&#39;] == &#39;Canada&#39;) &amp; (df[&#39;year&#39;] &gt;= 2000)]</code></pre>
+<pre><code>##     country continent  year  lifeExp       pop    gdpPercap
+## 250  Canada  Americas  2002   79.770  31902268  33328.96507
+## 251  Canada  Americas  2007   80.653  33390141  36319.23501</code></pre>
+<p>Let’s say you want to know the average life expectancy in Australia for all recorded years before 2000. Try this as an exercise. To calculate this, we will first have to filter our data frame with two conditions, and then we will have to calculate the mean.</p>
+<p>Hint: We can calculate the mean for all columns at once, and then just read off the Life Expectancy value to get the answer we are looking for.</p>
+<p>There are multiple ways to solve this. See the solutions below:</p>
+<pre class="python"><code># Solution 1
+df[(df[&#39;country&#39;] == &#39;Australia&#39;) &amp; (df[&#39;year&#39;] &lt; 2000)].mean(numeric_only = True)</code></pre>
+<pre><code>## year         1.974500e+03
+## lifeExp      7.343500e+01
+## pop          1.358108e+07
+## gdpPercap    1.746440e+04
+## dtype: float64</code></pre>
+<pre class="python"><code># Solution 2
+filtered_df = df[(df[&#39;country&#39;] == &#39;Australia&#39;) &amp; (df[&#39;year&#39;] &lt; 2000)]
+filtered_df[&#39;lifeExp&#39;].mean()</code></pre>
+<pre><code>## np.float64(73.435)</code></pre>
+<p>There are many different ways that will lead to the same answer! Try to think of another way to do it!</p>
+</div>
