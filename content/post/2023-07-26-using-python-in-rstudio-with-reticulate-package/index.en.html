@@ -1,0 +1,39 @@
+---
+title: Using Python in RStudio with Reticulate Package
+date: '2023-07-26 09:00:00 -0800'
+categories: [Python, P_IDE]
+tags: [python, rstudio]
+author: Madison
+output: 
+  html_document:
+    keep_md: TRUE
+---
+
+
+
+<p>As we know, Jupyter Notebook can be used easily with our UBC login information via <a href="https://ubc.syzygy.ca/">Syzygy</a>. Jupyter Notebook can also be downloaded to a computer and used via Anaconda. There are many different interfaces that allow us to use Python. One of the more interesting ones to note is actually RStudio. There is a package in R called <em>reticulate</em> that allows us to create an RMarkdown file and use both R and Python code chunks within the same file. This is actually how this blog is able to show both R and Python content! Let’s get started on how <em>reticulate</em> is used in RStudio to include Python code.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>First, installation is required. To install the reticulate package in RStudio from CRAN, type the following:</p>
+<pre><code>install.packages(&quot;reticulate&quot;)</code></pre>
+</div>
+<div id="python-version" class="section level2">
+<h2>Python Version</h2>
+<p>Next, we need to access the version of Python desired. Reticulate will, by default, find and use the version of Python via <code>PATH</code>. To check this, type <code>Sys.which("python")</code>.</p>
+<p>If you would like to change the version to something other than what is found in <code>PATH</code>, try the <code>use_python()</code> function. Here is an example of how to call the package from the library, and then use a different path to get to the desired Python version.</p>
+<pre><code>library(reticulate)
+use_python(&quot;/my/file/path/python&quot;)</code></pre>
+</div>
+<div id="getting-started" class="section level1">
+<h1>Getting Started</h1>
+<p>Now that the <em>reticulate</em> package has been installed, we can start using Python within an RMarkdown document.</p>
+<p>Once an RMarkdown file has been started, create a new code block. Note that on a Windows, a shortcut for adding a new code block is Ctrl+alt+i. Once a new code block appears, it should look like this:</p>
+<p><img src="images/r-code-chunk.png" /></p>
+<p>If you were to type code here, it would be in R. To change it to Python, simply replace the ‘r’ with ‘python’. Then it will look like this:</p>
+<p><img src="images/python-code-chunk.png" /></p>
+<p>Now, the console below will change to show Python code once something in this block is run. You can easily switch back and forth between R and Python from code chunk to code chunk.</p>
+<p>You can also see your saved variables in the environment, separated between R and Python. Note that when you do something such as import a dataset, if you wanted to perform manipulations on the dataset in both R and Python, you will have to load the dataset in using both R and Python, and it will create separate variables which do not override each other. They will stay speparate in the environment.</p>
+<p>To change between R and Python environments, go to the Environment window and click the dropdown arrow. It should look like this:</p>
+<p><img src="images/environment.png" /></p>
+<p>If you would like to see some examples, take a look at the <code>_src</code> folder in the GitHub repo for this blog to see how each of the posts are created in both R and Python. The link to the backend content for this blog can be found <a href="https://github.com/csc-ubc-okanagan/R-Python-Blog">here</a>.</p>
+</div>
