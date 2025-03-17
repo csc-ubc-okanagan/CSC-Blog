@@ -125,7 +125,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-1.png" /></p>
 <p>If we wanted to view this same scatterplot but also distinguish by colour, we could add in one small line at the end. Also, let’s add some axis titles and change the scale to reduce the white space.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_point().encode(
       x = alt.X(&#39;SepalLength&#39;, title = &#39;Sepal Length&#39;, scale = alt.Scale(domain = (4,9))),
@@ -174,7 +173,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-2.png" /></p>
 <p>Unfortunately, Altair only accepts the US spelling of colour!</p>
 <p>We see that the red and orange are a bit hard to distinguish. We can add in different shapes to help distinguish between species.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_point().encode(
@@ -225,7 +223,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-3.png" /></p>
 <div id="tooltips" class="section level2">
 <h2>Tooltips</h2>
 <p>There is a feature in Altair called a <code>tooltip</code> that allows users to interact with the plot.</p>
@@ -278,7 +275,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-4.png" /></p>
 <p>Notice that when you hover over the point, it lists the species value, because that is the one variable that we specified under the tooltip argument.</p>
 <p>We can add as many different columns to the tooltip as we want.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_point().encode(
@@ -330,7 +326,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-5.png" /></p>
 <p>Another feature we can add is the ability to make the graph interactive. This would allow the user to scroll or zoom.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_point().encode(
       x = alt.X(&#39;SepalLength&#39;, title = &#39;Sepal Length&#39;, scale = alt.Scale(domain = (4,9))),
@@ -381,7 +376,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-6.png" /></p>
 <p>Notice also there is a function called <code>mark_circle()</code> which is different than <code>mark_point()</code>.</p>
 <p>We can show the same graph as above, but with <code>mark_circle()</code> instead of <code>mark_point()</code>.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_circle().encode(
@@ -433,7 +427,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-7.png" /></p>
 <p>Let’s take a look at <code>mark_line()</code>, and let’s remove the shape argument.</p>
 <pre class="python"><code>alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_line().encode(
       x = alt.X(&#39;SepalLength&#39;, title = &#39;Sepal Length&#39;, scale = alt.Scale(domain = (4,9))),
@@ -483,7 +476,6 @@ alt.Chart(iris).mark_point().encode(
   </script>
 </body>
 </html>
-<p><img src="images/altair-8.png" /></p>
 <p>We can overlay plots on top of each other. Let’s plot the scatterplot and lines together.</p>
 <pre class="python"><code>line = alt.Chart(iris, title=&quot;Comparing Sepal Length to Sepal Width&quot;).mark_line().encode(
       x = alt.X(&#39;SepalLength&#39;, title = &#39;Sepal Length&#39;, scale = alt.Scale(domain = (4,9))),
@@ -540,7 +532,6 @@ line + point</code></pre>
   </script>
 </body>
 </html>
-<p><img src="images/altair-9.png" /></p>
 <p>We can also show multiple plots at once using the arguments we learned in part 3.</p>
 <p>Recall:</p>
 <ul>
@@ -597,7 +588,6 @@ line + point</code></pre>
   </script>
 </body>
 </html>
-<p><img src="images/altair-10.png" /></p>
 <p>To make it look nicer, we could add colour to each species, and then store it as a variable.</p>
 <pre class="python"><code>box = alt.Chart(iris, title = &#39;Petal Lengths of Species&#39;).mark_boxplot().encode(
       x = alt.X(&#39;Species&#39;, title = &#39;Type of Species&#39;),
@@ -647,7 +637,6 @@ box</code></pre>
   </script>
 </body>
 </html>
-<p><img src="images/altair-11.png" /></p>
 <p>If you want to show multiple plots in the same window, you can show 2 or more. Try writing <code>line | point | box</code>.</p>
 <p>You can also mix and match operators. Using brackets will help to organize the layout. Try writing <code>line | (point &amp; box)</code>.</p>
 <p>Many different Altair charts can be created using <code>mark_bar()</code>, <code>mark_line()</code>, <code>mark_point()</code>, <code>mark_rect()</code>, and so many more!</p>
