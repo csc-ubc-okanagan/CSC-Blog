@@ -1,0 +1,118 @@
+---
+title: Sample Data Generation
+date: '2024-04-09 09:00:00 -0800'
+categories: [Python, R]
+tags: [python, r] # tags always lowercase
+author: Nijiati
+output: 
+  html_document:
+    keep_md: TRUE
+---
+
+
+
+<div id="creating-sample-datasets" class="section level2">
+<h2>Creating Sample Datasets</h2>
+<p>This guide provides instructions on how to create sample datasets in <code>R</code> and <code>Python</code>. You can use these methods to generate a mini version of your original dataset for data consultations, enabling efficient and effective analysis on a manageable subset of your data. We assume you know how to read in your data, however, if you need step by step instructions on this, these are available further down the page for both <code>R</code> and <code>Python</code>.</p>
+<div id="r" class="section level3">
+<h3><code>R</code></h3>
+<p><strong>Prerequisites</strong></p>
+<p>You will need <code>dplyr</code> installed. You can double check that you have it installed:</p>
+<pre class="r"><code>find.package(&quot;dplyr&quot;) # returns an error if the package is not installed, else returns the path to the package</code></pre>
+<pre><code>## [1] &quot;/Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/library/dplyr&quot;</code></pre>
+<p>And install it if necessary:</p>
+<pre class="r"><code>install.packages(&quot;dplyr&quot;) # REQUIRED</code></pre>
+<p>We want a minimum of 10 samples per variable or a maximum of 40% of your data if there is concern that 10 samples per variable will be insufficient for demonstration purposes. We want to store the output as an <code>R</code> object.</p>
+<p><strong>10 samples per variable</strong></p>
+<ul>
+<li>Replace <code>your_data_frame</code> in the second line with the name you assigned to your data on import.</li>
+<li>Replace <code>"path/to/your/file.RData"</code> in the last line with the path and file name to save your sampled data to.</li>
+</ul>
+<pre class="r"><code>library(dplyr)
+df_to_sample &lt;- your_data_frame
+n_samples &lt;- ncol(df_to_sample) * 10 # calculate the number of variables in your data frame and multiply by 10
+sampled_data &lt;- df_to_sample %&gt;% slice_sample(n_samples) # take the sample
+save(sampled_data, file = &quot;path/to/your/file.RData&quot;) # choose a location to save your RData file with the .RData extension</code></pre>
+<p>Bring the resulting .RData file with you to your consultation.</p>
+<p><strong>40% of your observations</strong></p>
+<ul>
+<li>Replace <code>your_data_frame</code> in the second line with the name you assigned to your data on import.</li>
+<li>Replace <code>"path/to/your/file.RData"</code> in the last line with the path and file name to save your sampled data to.</li>
+</ul>
+<pre class="r"><code>library(dplyr)
+df_to_sample &lt;- your_data_frame
+n_samples &lt;- round(nrow(df_to_sample) * 0.4) # calculate the number of observations in your data frame and multiply by 0.4
+sampled_data &lt;- df_to_sample %&gt;% slice_sample(n_samples) # take the sample
+save(sampled_data, file = &quot;path/to/your/file.RData&quot;) # choose a location to save your RData file with the .RData extension</code></pre>
+<p>Bring the resulting .RData file with you to your consultation.</p>
+</div>
+<div id="python" class="section level3">
+<h3><code>Python</code></h3>
+<p>We want a minimum of 10 samples per variable or a maximum of 40% of your data if there is concern that 10 samples per variable will be insufficient for demonstration purposes. We want to store the output as a csv file.</p>
+<p><strong>10 samples per variable</strong></p>
+<ul>
+<li>Replace <code>your_data_frame</code> in the second line with the name you assigned to your data on import.</li>
+<li>Replace <code>"path/to/your/file.RData"</code> in the last line with the path and file name to save your sampled data to.</li>
+</ul>
+<pre class="python"><code>import pandas as pd
+df_to_sample = your_data_frame
+n_samples = len(df_to_sample.columns) * 10 # calculate the number of variables in your data frame and multiply by 10
+sampled_data = df_to_sample.sample(n = n_samples) # take the sample
+sampled_data.to_csv(&quot;path/to/your/file.csv&quot;) # choose a location to save your csv file with a .csv extension</code></pre>
+<p>Bring the resulting .csv filw with you to your consultation.</p>
+<p><strong>40% of your observations</strong></p>
+<ul>
+<li>Replace <code>your_data_frame</code> in the second line with the name you assigned to your data on import.</li>
+<li>Replace <code>"path/to/your/file.RData"</code> in the last line with the path and file name to save your sampled data to.</li>
+</ul>
+<pre class="python"><code>import pandas as pd
+df_to_sample = your_data_frame
+n_samples = round(df_to_sample.shape[0] * 0.4) # calculate the number of observations in your data frame and multiply by 0.4
+sampled_data = df_to_sample.sample(n = n_samples) # take the sample
+sampled_data.to_csv(&quot;path/to/your/file.csv&quot;) # choose a location to save your csv file with a .csv extension</code></pre>
+</div>
+</div>
+<div id="importing-data" class="section level2">
+<h2>Importing data</h2>
+<div id="importing-data-into-r" class="section level3">
+<h3>Importing Data into <code>R</code></h3>
+<p><strong>Prerequisites</strong></p>
+<p>Make sure you have the <code>readr</code> package for CSV, <code>readxl</code> package for Excel, or <code>jsonlite</code> package for JSON installed. If not, you can install them using:</p>
+<pre class="r"><code>install.packages(&quot;readr&quot;) # if reading in csv or other delimited rectangular data
+install.packages(&quot;readxl&quot;) # if reading in Excel files
+install.packages(&quot;jsonlite&quot;) # if reading in JSON files</code></pre>
+<ul>
+<li>Import CSV file:</li>
+</ul>
+<pre class="r"><code>library(readr)
+df_to_sample &lt;- read_csv(&#39;path/to/your/file.csv&#39;)</code></pre>
+<ul>
+<li>Import Excel file:</li>
+</ul>
+<pre class="r"><code>library(readxl)
+df_to_sample &lt;- read_excel(&#39;path/to/your/file.xlsx&#39;)</code></pre>
+<ul>
+<li>Import JSON file</li>
+</ul>
+<pre class="r"><code>library(jsonlite)
+df_to_sample &lt;- fromJSON(&#39;path/to/your/file.json&#39;)</code></pre>
+</div>
+<div id="importing-data-in-python" class="section level3">
+<h3>Importing Data in <code>Python</code></h3>
+<ul>
+<li>Import CSV file:</li>
+</ul>
+<pre class="python"><code>import pandas as pd
+df_to_sample = pd.read_csv(&#39;path/to/your/file.csv&#39;)</code></pre>
+<ul>
+<li>Import Excel file:</li>
+</ul>
+<pre class="python"><code>import pandas as pd
+df_to_sample = pd.read_excel(&#39;path/to/your/file.xlsx&#39;)</code></pre>
+<ul>
+<li>Import JSON file:</li>
+</ul>
+<pre class="python"><code>import pandas as pd
+df_to_sample = pd.read_json(&#39;path/to/your/file.json&#39;)</code></pre>
+</div>
+</div>
