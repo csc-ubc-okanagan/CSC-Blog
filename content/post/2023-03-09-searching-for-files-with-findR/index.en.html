@@ -379,36 +379,26 @@ while some special characters need to be preceeded by <code>\\</code>,
 such as <code>+</code>, <code>(</code>. Failing to escape and
 double-escape special characters will cause the function to miss the
 files or fail:</p>
-<pre class="r"><code>findRscript(&#39;library(\&#39;ctmm\&#39;)&#39;,
-            path = &#39;~/GitHub/hr-resource-stoch/env-var-review/analysis&#39;)</code></pre>
-<pre><code>## No R scripts found!</code></pre>
-<pre class="r"><code>findRscript(&#39;library\\(\&#39;ctmm\&#39;\\)&#39;,
-            path = &#39;~/GitHub/bc-mammals-temperature/analysis&#39;)</code></pre>
+<pre class="r"><code>setwd(&#39;~/Github/bc-mammals-temperature&#39;) # change working directory
+findRscript(&#39;library(\&#39;ctmm\&#39;)&#39;, path = &#39;analysis&#39;)</code></pre>
+<pre><code>## Number of R scripts scanned: 33</code></pre>
+<pre><code>## Number of R scripts with matching content: 0</code></pre>
+<pre><code>## Total number of matches: 0</code></pre>
+<pre class="r"><code>findRscript(&#39;library\\(\&#39;ctmm\&#39;\\)&#39;, path = &#39;analysis&#39;)</code></pre>
 <pre><code>## Number of R scripts scanned: 33</code></pre>
 <pre><code>## Number of R scripts with matching content: 10</code></pre>
 <pre><code>## Total number of matches: 10</code></pre>
-<pre><code>##                                                                                                 path_to_file
-## 1                       C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/00-download-bc-dem.R
-## 2                 C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/01-compile-tracking-data.R
-## 3        C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/01a-compile-goat-calibration-data.R
-## 4                       C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/02-remove-outliers.R
-## 5              C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/03-movement-models-parallel.R
-## 6         C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/04-dowload-era5-temperature-data.R
-## 7            C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/05-add-speeds-and-temperature.R
-## 8                     C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/06-temperature-hrsfs.R
-## 9  C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/10-local-weather-predictions-by-species.R
-## 10                C:/Users/stefa/Documents/GitHub/bc-mammals-temperature/analysis/figures/telemetry-ud-map.R
-##    line
-## 1     7
-## 2     4
-## 3     4
-## 4     4
-## 5     5
-## 6     7
-## 7     9
-## 8     5
-## 9    11
-## 10    5</code></pre>
+<pre><code>##                                          path_to_file line
+## 1                       analysis/00-download-bc-dem.R    7
+## 2                 analysis/01-compile-tracking-data.R    4
+## 3        analysis/01a-compile-goat-calibration-data.R    4
+## 4                       analysis/02-remove-outliers.R    4
+## 5              analysis/03-movement-models-parallel.R    5
+## 6         analysis/04-dowload-era5-temperature-data.R    7
+## 7            analysis/05-add-speeds-and-temperature.R    9
+## 8                     analysis/06-temperature-hrsfs.R    5
+## 9  analysis/10-local-weather-predictions-by-species.R   11
+## 10                analysis/figures/telemetry-ud-map.R    5</code></pre>
 <p>The package can also search for <code>R</code> Markdown files, PDFs,
 and text (<code>.txt</code>) files via the <code>findRmd()</code>,
 <code>findPDF()</code>, and <code>findtxt()</code> functions,
