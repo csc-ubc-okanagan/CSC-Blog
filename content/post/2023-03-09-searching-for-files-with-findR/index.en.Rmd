@@ -34,8 +34,10 @@ library('findR')
 The `pattern` argument can be any code string, but note that single and double quotes need to be escaped by placing a `\` before them (i.e., `\'` and `\"`), while some special characters need to be preceeded by `\\`, such as `+`, `(`. Failing to escape and double-escape special characters will cause the function to miss the files or fail:
 
 ```{r}
-findRscript('library(\'ctmm\')', path = 'H:/GitHub/env-var-review/analysis')
-findRscript('library\\(\'ctmm\'\\)', path = 'H:/GitHub/env-var-review/analysis')
+findRscript('library(\'ctmm\')',
+            path = '~/GitHub/hr-resource-stoch/env-var-review/analysis')
+findRscript('library\\(\'ctmm\'\\)',
+            path = '~/GitHub/bc-mammals-temperature/analysis')
 ```
 
 The package can also search for `R` Markdown files, PDFs, and text (`.txt`) files via the `findRmd()`, `findPDF()`, and `findtxt()` functions, respectively. Each of the functions can also copy the files that matched the `pattern` argument to a new folder (if `copy = TRUE`, but it is `FALSE` by default). You can decide which folder the files get copied to using the `folder` argument. Note that by default `overwrite` is set to `TRUE`, so any files present with the same name will be overwritten.
