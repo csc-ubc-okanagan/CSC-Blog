@@ -9,9 +9,7 @@ output:
     keep_md: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+
 
 Color schemes are a matter of preference, but I think many of us can agree that RStudio's default theme is quite bright and low-contrast. Fortunately, RStudio offers some alternative themes, which you can see by clicking on `Tools > Global Options` in the top ribbon menu in RStudio. You can then select `Appearance` and change the Editor theme.
 
