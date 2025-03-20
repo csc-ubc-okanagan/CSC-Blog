@@ -3,7 +3,7 @@ title: Getting started with GitHub
 date: '2024-09-16 12:00:00 -0800'
 categories: [R]
 tags: [r, rstudio, github] # tags always lowercase
-author: stefano
+author: Stefano Mezzini
 output: 
   html_document:
     keep_md: TRUE
