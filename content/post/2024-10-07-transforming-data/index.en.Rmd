@@ -79,7 +79,7 @@ coef(m_2)
 appraise(m_2, point_alpha = 0.3)
 ```
 
-The `log1p` transformation resulted in a somewhat more symmetrical distribution of residuals, and the mode of the distribution is closer to zero, and improved the issue of non-constant variance (heteroskedasticity). The coefficients are also harder to interpret because they are on the `log1p` scale, since the model is $$\log(Y+1)=0.86 - 0.60 \,x_1$$.
+The `log1p` transformation resulted in a somewhat more symmetrical distribution of residuals, and the mode of the distribution is closer to zero, and improved the issue of non-constant variance (heteroskedasticity). The coefficients are also harder to interpret because they are on the `log1p` scale, since the model is $$\log(Y+1)=0.86 - 0.60 \,x_1.$$
 
 Rather than forcing our response variable to be Gaussian when it isn't (see [this modeling workshop](https://events.ok.ubc.ca/event/fitting-models-to-data-not-data-to-models-eight-workshop-series/) I created with the CSC), we can fit a model that fits our data well: a Generalized Linear Model (GLM). GLMs allow one to recognize the structure of the response variable (e.g., any bounds and the mean-variance relationship) by specifying an appropriate statistical distribution (e.g., Gaussian, binomial, etc.).
 
@@ -91,11 +91,11 @@ coef(m_3)
 appraise(m_3, point_alpha = 0.3)
 ```
 
-The output from `coef()` tells us that the GLM is $$\lambda = e{0.51-1.39\,x_1}$$. This means that after the intervention, the number of accidents decreased to $e^-1.39 * 100%= 0.25%$ what they were in the 12 months before.
+The output from `coef()` tells us that the GLM is $$\lambda = e{0.51-1.39\,x_1}.$$ This means that after the intervention, the number of accidents decreased to $e^-1.39 * 100%= 0.25%$ what they were in the 12 months before.
 
 With the GLM, we can see a improvement in both the q-q plot and histogram of residuals, and while the variance still increases with the mean number of accidents, the model now expects that to be the case. This is because the variance of a Poisson distributions is equal to its mean, both of which are usually indicated as $\lambda$ rather than $\lambda$.
 
-The $\log$ link function (`link = 'log'`) allows us to create a model that will only give us non-negative numbers of accidents by having the form $$\log(\lambda) = 0.51-1.39 \, x_1,$$ which we can re-write as $$\lambda = e^{ 0.51-1.39 \, x_1}$$. Notice that while this model may look similar to the `log1p` model, the $\log$ function is applied to $\lambda$, the mean of $Y$, rather than to $Y$ directly. This is important because it removes the systematic bias that results from applying non-linear transformations such as $\log(Y)$, $\sqrt{Y}$, and $\arcsin\left(\sqrt{Y}\right)$ to a random variable. Now that we have three models, let's compare between the predictions that the tree give us:
+The $\log$ link function (`link = 'log'`) allows us to create a model that will only give us non-negative numbers of accidents by having the form $$\log(\lambda) = 0.51-1.39 \, x_1,$$ which we can re-write as $$\lambda = e^{ 0.51-1.39 \, x_1}.$$ Notice that while this model may look similar to the `log1p` model, the $\log$ function is applied to $\lambda$, the mean of $Y$, rather than to $Y$ directly. This is important because it removes the systematic bias that results from applying non-linear transformations such as $\log(Y)$, $\sqrt{Y}$, and $\arcsin\left(\sqrt{Y}\right)$ to a random variable. Now that we have three models, let's compare between the predictions that the tree give us:
 
 ```{r}
 # predictions
@@ -140,7 +140,7 @@ ggplot() +
   khroma::scale_color_highcontrast(name = 'Model')
 ```
 
-From the plot above, we can see that the LM and GLM have fairly similar coefficient estimates and that the `log1p` LM resulted in lower estimates for both. This is due to a systematic bias that occurs when one applies a nonlinear transformation to a random variable, like taking $\$. I explain why in the sections below. Additionally, while the LM's coefficients are reasonable, the 95% [Bayesian Credible Intervals](https://en.wikipedia.org/wiki/Credible_interval) (BCIs) for the post-intervention estimate are not appropriate because they include negative values. In contrast, the GLM's BCIs are asymmetric: they are shorter below the mean and longer above the mean. This is recognizes that a multiplicative change for large values is larger than one for small values: a 50% decrease will take 2 to 1 and take 4 to 2. Consequently, asymmetric BCIs provide a better representation of the model's uncertainty.
+From the plot above, we can see that the LM and GLM have fairly similar coefficient estimates and that the `log1p` LM resulted in lower estimates for both. This is due to a systematic bias that occurs when one applies a nonlinear transformation to a random variable, like $\log(Y)$. I explain why in the sections below. Additionally, while the LM's coefficients are reasonable, the 95% [Bayesian Credible Intervals](https://en.wikipedia.org/wiki/Credible_interval) (BCIs) for the post-intervention estimate are not appropriate because they include negative values. In contrast, the GLM's BCIs are asymmetric: they are shorter below the mean and longer above the mean. This is recognizes that a multiplicative change for large values is larger than one for small values: a 50% decrease will take 2 to 1 and take 4 to 2. Consequently, asymmetric BCIs provide a better representation of the model's uncertainty.
 
 ## Linear and nonlinear transformations
 
@@ -170,7 +170,7 @@ expand_grid(Y = Y,
 
 ### Jensen's inequality
 
-[Jensen's inequality](https://en.wikipedia.org/wiki/Jensen%27s_inequality) demostrates that if we apply a nonlinear transformation to a random variable, we can't simply back-transform the mean. This is because, if $g()$ is a nonlinear transformation and $g^{-1}()$ is its inverse (e.g, $g() = \log()$ and $g^{-1}()=\exp()$): $$g\big[\mathbb E(Y)\big] \ne \mathbb E\big[g(Y)\big],$$ where $\mathbb E()$ indicates an expected value such that $\mathbb E(Y)=\mu$. This implies that $$\mathbb E(Y) = \mu \ne g^{-1}\bigg\{\mathbb E\big[g(Y)\big]\bigg\}$$.
+[Jensen's inequality](https://en.wikipedia.org/wiki/Jensen%27s_inequality) demostrates that if we apply a nonlinear transformation to a random variable, we can't simply back-transform the mean. This is because, if $g()$ is a nonlinear transformation and $g^{-1}()$ is its inverse (e.g, $g() = \log()$ and $g^{-1}()=\exp()$): $$g\big[\mathbb E(Y)\big] \ne \mathbb E\big[g(Y)\big],$$ where $\mathbb E()$ indicates an expected value such that $\mathbb E(Y)=\mu$. This implies that $$\mathbb E(Y) = \mu \ne g^{-1}\bigg\{\mathbb E\big[g(Y)\big]\bigg\}.$$
 
 Here is a graphical example to help you visualize why. The green vertical line is the estimated mean (i.e., what we're usually interested in), the blue line is the estimated mean of the square-root transformed $Y$, and the blue line is the back-transformed estimated mean of the square-root transformed $Y$. The black line is the estimated bias.
 
