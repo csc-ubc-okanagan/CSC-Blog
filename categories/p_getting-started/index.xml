@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>P_Getting Started on R &amp; Python Blog</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/categories/p_getting-started/</link><description>Recent content in P_Getting Started on R &amp; Python Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Center for Scholarly Communication, UBC Okanagan</copyright><lastBuildDate>Thu, 15 Jun 2023 09:00:00 -0800</lastBuildDate><atom:link href="https://csc-ubc-okanagan.github.io/CSC-Blog/categories/p_getting-started/index.xml" rel="self" type="application/rss+xml"/><item><title>Defining Functions in Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/defining-functions-in-python/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/defining-functions-in-python/</guid><description>
+&lt;p>Functions take in data and do things with that data. We can write our own functions, but generally in Python we’ll be using functions that have already been written or built.&lt;/p>
+&lt;p>Simple functions can be in base Python or in different packages. Take these base Python functions for example:&lt;/p>
+&lt;pre class="python">&lt;code>sum((1,1))&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 2&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>max([1, 2, 5, 8, 3])&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 8&lt;/code>&lt;/pre>
+&lt;p>Calling a function requires 2 things: the function itself and any arguments the function allows us to specify – one of these arguments is the data source, but there are usually other parameters we can specify.&lt;/p>
+&lt;p>If we want to understand how the built-in functions work, let’s define our own function for addition. We start by naming it, and then defining the arguments. Here, let’s call it ‘add’ and it will take in two numbers, so we set the arbitrary names of these arguments to x and y.&lt;/p>
+&lt;pre class="python">&lt;code>def add(x,y):
+answer = x + y
+return answer
+add(1,1)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 2&lt;/code>&lt;/pre>
+&lt;p>This is cool, but unnecessary work. It’s much easier to use the built-in function that we use above. This is why packages are so useful. Other people have spent time defining functions to do typical tasks, so we can use the existing work rather than duplicating effort.&lt;/p>
+&lt;p>Note that there may be limitations or unexpected behaviours to a function. What would happen if we added x+y in this function?&lt;/p>
+&lt;pre class="python">&lt;code>add(&amp;#39;x&amp;#39;,&amp;#39;y&amp;#39;)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;#39;xy&amp;#39;&lt;/code>&lt;/pre>
+&lt;p>This is something to consider when creating functions! It may not always be used for its intended use.&lt;/p>
+&lt;p>If we wanted to create a function to reverse a number, we could do that first by defining the name of our function, as well as how many arguments it requires. At the end, a function will need to do something either by using the command &lt;code>return&lt;/code> or &lt;code>print&lt;/code> or something else, otherwise it serves no purpose.&lt;/p>
+&lt;p>With this function, if we input the number 12345, we would expect it to return 54321.&lt;/p>
+&lt;pre class="python">&lt;code>def reverse_num(number):
+num = number
+reversed_num = 0
+while num != 0:
+digit = num % 10
+reversed_num = reversed_num * 10 + digit
+num //= 10
+print(&amp;quot;Reversed Number: &amp;quot; + str(reversed_num))
+reverse_num(12345)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## Reversed Number: 54321&lt;/code>&lt;/pre>
+&lt;p>It works! Can you think of any limitations or unexpected uses for this function?&lt;/p></description></item><item><title>Dictionaries in Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/dictionaries-in-python/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/dictionaries-in-python/</guid><description>
+&lt;p>A dictionary lists key-value pairs, which could also be thought of as associated values where a key matches to the associated value. Let’s look at a few examples.&lt;/p>
+&lt;pre class="python">&lt;code># Dictionary - mapping between values
+house = {&amp;#39;bedrooms&amp;#39;: 3, &amp;#39;bathrooms&amp;#39;: 2,
+&amp;#39;city&amp;#39;: &amp;#39;Kelowna&amp;#39;, &amp;#39;price&amp;#39;: 250000}&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>house[&amp;#39;price&amp;#39;]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 250000&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>course = {&amp;#39;Data Science&amp;#39;: [&amp;#39;DATA100&amp;#39;, &amp;#39;DATA200&amp;#39;, &amp;#39;DATA300&amp;#39;],
+&amp;#39;Science&amp;#39;: [&amp;#39;SCIENCE100&amp;#39;, &amp;#39;SCIENCE200&amp;#39;, &amp;#39;SCIENCE300&amp;#39;]}&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>course[&amp;#39;Data Science&amp;#39;]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [&amp;#39;DATA100&amp;#39;, &amp;#39;DATA200&amp;#39;, &amp;#39;DATA300&amp;#39;]&lt;/code>&lt;/pre>
+&lt;p>What if we wanted to turn the following information into a dictionary.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr class="header">
+&lt;th align="left">Name&lt;/th>
+&lt;th align="left">ID&lt;/th>
+&lt;th align="left">Campus&lt;/th>
+&lt;th align="left">Courses&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr class="odd">
+&lt;td align="left">Dan&lt;/td>
+&lt;td align="left">12345678&lt;/td>
+&lt;td align="left">Okanagan&lt;/td>
+&lt;td align="left">DATA100, ENGL100, HIST100, CHEM100&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>This is how we would do this:&lt;/p>
+&lt;pre class="python fold-hide">&lt;code>student = {&amp;#39;Name&amp;#39; : &amp;#39;Dan&amp;#39;,
+&amp;#39;ID&amp;#39; : 12345678,
+&amp;#39;Campus&amp;#39; : &amp;#39;Okanagan&amp;#39;,
+&amp;#39;Courses&amp;#39;: [&amp;#39;DATA100&amp;#39;, &amp;#39;ENGL100&amp;#39;, &amp;#39;HIST100&amp;#39;, &amp;#39;CHEM100&amp;#39;]}
+student&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## {&amp;#39;Name&amp;#39;: &amp;#39;Dan&amp;#39;, &amp;#39;ID&amp;#39;: 12345678, &amp;#39;Campus&amp;#39;: &amp;#39;Okanagan&amp;#39;, &amp;#39;Courses&amp;#39;: [&amp;#39;DATA100&amp;#39;, &amp;#39;ENGL100&amp;#39;, &amp;#39;HIST100&amp;#39;, &amp;#39;CHEM100&amp;#39;]}&lt;/code>&lt;/pre></description></item><item><title>Lists in Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/lists-in-python/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/lists-in-python/</guid><description>
+&lt;p>Lists are an important tool used in Python. Lists can contain elements of mixed types as well. Let’s look at a few examples.&lt;/p>
+&lt;pre class="python">&lt;code># List
+list1 = []
+list1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## []&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>list2 = [1, &amp;#39;UBC&amp;#39;, 100]
+list2&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 100]&lt;/code>&lt;/pre>
+&lt;p>Now let’s see a few operations we can perform on a list.&lt;/p>
+&lt;pre class="python">&lt;code>len(list1)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>len(list2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># Indexing Example - we will talk more about this later on
+list2[2]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 100&lt;/code>&lt;/pre>
+&lt;p>Note - Python indexing starts at zero, so the first element in the list is 0, the second is 1, and the third is 2, so if we actually wanted the second element, we would have to do this:&lt;/p>
+&lt;pre class="python">&lt;code>list2[1]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;#39;UBC&amp;#39;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>type(list2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;list&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>type(list2[1])&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;str&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;p>As we mentioned earlier, a main difference between lists and tuples is that lists are mutable. Mutable means that elements in a list can be appended, changed, or deleted.&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list = [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;]
+mixed_list.append(&amp;#39;New&amp;#39;)
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;, &amp;#39;New&amp;#39;]&lt;/code>&lt;/pre>
+&lt;p>If we decided that we wanted to replace ‘New’ with 4, we could do so like this:&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list[4]= 4
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre>
+&lt;p>If we wanted to remove elements from the list, we could do so like this:&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list.remove(&amp;#39;UBC&amp;#39;)
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, 5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre>
+&lt;p>Note that this will only remove the first occurrence, if this happened to be in the list more than once. It would also call an error message if the element doesn’t exist.&lt;/p>
+&lt;p>If we wanted to remove it based on the index of the list:&lt;/p>
+&lt;pre class="python">&lt;code>del mixed_list[0]
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre></description></item><item><title>Loops in Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/loops-in-python/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/loops-in-python/</guid><description>
+&lt;p>Loops are a common tool used in Python to help users iterate through lists, or perform the same operation numerous times without added efforts.&lt;/p>
+&lt;p>Let’s look at a few examples:&lt;/p>
+&lt;pre class="python">&lt;code># Loops
+for n in [0, 1, 5, 2, -5]:
+# this is inside the loop
+print(&amp;quot;The number is&amp;quot;, n, &amp;quot;and its squared value is&amp;quot;, n**2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## The number is 0 and its squared value is 0
+## The number is 1 and its squared value is 1
+## The number is 5 and its squared value is 25
+## The number is 2 and its squared value is 4
+## The number is -5 and its squared value is 25&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># this is outside the loop&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>## Loop
+s = &amp;quot;Python&amp;quot;
+for c in s:
+print(c + &amp;quot;!&amp;quot;)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## P!
+## y!
+## t!
+## h!
+## o!
+## n!&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># range(10) sets values 0-9, because recall Python starts at 0, not 1
+for i in range(10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9&lt;/code>&lt;/pre>
+&lt;p>This is equivalent to writing:&lt;/p>
+&lt;pre class="python">&lt;code>for i in range(0,10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9&lt;/code>&lt;/pre>
+&lt;p>If we wanted it to start at 1 and go to 10 (inclusive), we would write:&lt;/p>
+&lt;pre class="python">&lt;code>for i in range(1,11):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9
+## 10&lt;/code>&lt;/pre>
+&lt;p>Other examples:&lt;/p>
+&lt;pre class="python">&lt;code>#(start,end,increments)
+for i in range(0,101,10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 10
+## 20
+## 30
+## 40
+## 50
+## 60
+## 70
+## 80
+## 90
+## 100&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>n = 3
+while n &amp;gt; 0:
+print(n)
+n = n - 1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3
+## 2
+## 1&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>print(&amp;quot;Smile!&amp;quot;)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## Smile!&lt;/code>&lt;/pre></description></item><item><title>Packages in Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/packages-in-python/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/packages-in-python/</guid><description>
+&lt;p>Since Python is so widely used, there are many people who contribute to continuously improving and developing it. Let’s imagine Python as a base version. It can do basic calculations, but it requires extra efforts to do more complicated things. People have created extras or add-ons to help create shortcuts for more complicated specific tasks or functions. These ‘add-ons’ are called modules. A module allows us to use already defined classes, functions, variables, and more. Packages are a collection of similar modules. These modules are stored together in a package to help with storage and ease of use.&lt;/p>
+&lt;p>Packages can be imported to use to help make things easier. For example, there is a Python package called math that helps with basic mathematical operations.&lt;/p>
+&lt;p>To use a package or specific module within it, we use the &lt;code>import&lt;/code> command. The format of these commands is as followed:&lt;/p>
+&lt;p>&lt;code>import package.subpackage.modulename&lt;/code>&lt;/p>
+&lt;p>We can also nickname the packages to make it easier when we use them. This is done using the &lt;code>as&lt;/code> statement. An example of this is &lt;code>import pandas as pd&lt;/code>. By doing this, whenever a function from pandas is used, instead of having to type &lt;code>pandas.function_name&lt;/code>, we can type &lt;code>pd.function_name&lt;/code>. This may not seem like a big difference, but when it is used repeatedly, this can save a lot of time and effort.&lt;/p>
+&lt;p>A few of the main packages used in python include:&lt;/p>
+&lt;table>
+&lt;colgroup>
+&lt;col width="33%" />
+&lt;col width="33%" />
+&lt;col width="33%" />
+&lt;/colgroup>
+&lt;thead>
+&lt;tr class="header">
+&lt;th>Package Name&lt;/th>
+&lt;th>Usage&lt;/th>
+&lt;th>Standard Import Command&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr class="odd">
+&lt;td>NumPy&lt;/td>
+&lt;td>Used for arrays, matricies and mathematical functions&lt;/td>
+&lt;td>import numpy as np&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td>pandas&lt;/td>
+&lt;td>Used with data frames&lt;/td>
+&lt;td>import pandas as pd&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td>matplotlib&lt;/td>
+&lt;td>Typically used for plotting functions&lt;/td>
+&lt;td>from matplotlib import pyplot as plt&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td>altair&lt;/td>
+&lt;td>More advanced plotting options&lt;/td>
+&lt;td>import altair as alt&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td>SciPy&lt;/td>
+&lt;td>Used for scientific and technical computing&lt;/td>
+&lt;td>import scipy&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>There are many other packages available, and you can even create your own as well! To see a list of the top packages available in Python, visit this &lt;a href="https://www.ubuntupit.com/best-python-libraries-and-packages-for-beginners/#:~:text=Best%20Python%20Libraries%20and%20Packages.%2001.%20Pillow.%20Pillow,Matplotlib.%2003.%20Numpy.%2004.%20OpenCV%20Python.%2005.%20Requests.">link&lt;/a>.&lt;/p></description></item><item><title>Python Data Types</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/python-data-types/</link><pubDate>Thu, 15 Jun 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/python-data-types/</guid><description>
+&lt;p>When we talk about data, we can talk about data types, data classes, and data structures.&lt;/p>
+&lt;p>Data types are fundamental building blocks for storing information. Below, we can see a chart of all of the datatypes in Python.&lt;/p>
+&lt;table>
+&lt;colgroup>
+&lt;col width="22%" />
+&lt;col width="27%" />
+&lt;col width="27%" />
+&lt;col width="22%" />
+&lt;/colgroup>
+&lt;thead>
+&lt;tr class="header">
+&lt;th align="left">&lt;span style="color:lightBlue">English name&lt;/span>&lt;/th>
+&lt;th align="center">&lt;span style="color:lightBlue">Type name&lt;/span>&lt;/th>
+&lt;th align="center">&lt;span style="color:lightBlue">Description&lt;/span>&lt;/th>
+&lt;th align="right">&lt;span style="color:lightBlue">Example&lt;/span>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr class="odd">
+&lt;td align="left">integer&lt;/td>
+&lt;td align="center">&lt;strong>int&lt;/strong>&lt;/td>
+&lt;td align="center">positive/negative whole numbers&lt;/td>
+&lt;td align="right">&lt;span style="color:green">13&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">floating point number&lt;/td>
+&lt;td align="center">&lt;strong>float&lt;/strong>&lt;/td>
+&lt;td align="center">real number in decimal form&lt;/td>
+&lt;td align="right">&lt;span style="color:green">3.1415&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">boolean&lt;/td>
+&lt;td align="center">&lt;strong>bool&lt;/strong>&lt;/td>
+&lt;td align="center">true or false&lt;/td>
+&lt;td align="right">&lt;span style="color:green">True&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">string&lt;/td>
+&lt;td align="center">&lt;strong>str&lt;/strong>&lt;/td>
+&lt;td align="center">text&lt;/td>
+&lt;td align="right">&lt;span style="color:green">“Do you like Python?”&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">list&lt;/td>
+&lt;td align="center">&lt;strong>list&lt;/strong>&lt;/td>
+&lt;td align="center">a collection of objects - mutable &amp;amp; ordered&lt;/td>
+&lt;td align="right">&lt;span style="color:green">[‘Hi’,‘Hello’,‘Hola’]&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">tuple&lt;/td>
+&lt;td align="center">&lt;strong>tuple&lt;/strong>&lt;/td>
+&lt;td align="center">a collection of objects - immutable &amp;amp; ordered&lt;/td>
+&lt;td align="right">&lt;span style="color:green">(‘Tuesday’,3,14,2023)&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">dictionary&lt;/td>
+&lt;td align="center">&lt;strong>dict&lt;/strong>&lt;/td>
+&lt;td align="center">mapping of key-value pairs&lt;/td>
+&lt;td align="right">&lt;span style="color:green">{‘name’:‘Madison’,‘Program’:‘Data Science’,‘Age’:23}&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">none&lt;/td>
+&lt;td align="center">&lt;strong>NoneType&lt;/strong>&lt;/td>
+&lt;td align="center">represents no value&lt;/td>
+&lt;td align="right">&lt;span style="color:green">None&lt;/span>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Note that character data, also known as strings, are always wrapped in “quotation marks”. You can use single quotes like ‘this’ or double quotes like “this”. As long as you use two of the same, it doesn’t matter which you use!&lt;/p>
+&lt;p>We can use the function &lt;code>type()&lt;/code> to view the datatype of the stored value in a variable. Let’s explore a few examples of this.&lt;/p>
+&lt;pre class="python">&lt;code># Datatype
+x = 1 + 1
+type(x)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;int&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>x = 2.0
+type(x)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;float&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># String
+string = &amp;#39;Okanagan&amp;#39;
+print(string)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## Okanagan&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>type(x)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;float&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;div id="comparison-operators" class="section level2">
+&lt;h2>Comparison Operators&lt;/h2>
+&lt;p>We can compare objects (or variables) using comparison operators. The result is a Boolean value. Recall from above that a Boolean gives either a True or False.&lt;/p>
+&lt;p>First, let’s look at a table of the different comparison operators.&lt;/p>
+&lt;div id="comparison-operators-1" class="section level4">
+&lt;h4>Comparison Operators&lt;/h4>
+&lt;table>
+&lt;colgroup>
+&lt;col width="50%" />
+&lt;col width="50%" />
+&lt;/colgroup>
+&lt;thead>
+&lt;tr class="header">
+&lt;th align="left">&lt;span style="color:blue">Operator&lt;/span>&lt;/th>
+&lt;th align="left">&lt;span style="color:blue">Description&lt;/span>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr class="odd">
+&lt;td align="left">&lt;span style="color:green">x == y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> equal to &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">&lt;span style="color:green">x != y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> not equal to &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">&lt;span style="color:green">x &amp;gt; y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> greater than &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">&lt;span style="color:green">x &amp;gt;= y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> greater than or equal to &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">&lt;span style="color:green">x &amp;lt; y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> less than &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">&lt;span style="color:green">x &amp;lt;= y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> less than or equal to &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">&lt;span style="color:green">x is y&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> the same object as &lt;span style="color:green">y&lt;/span>?&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">&lt;span style="color:green">x and y&lt;/span>&lt;/td>
+&lt;td align="left">are &lt;span style="color:green">x&lt;/span> and &lt;span style="color:green">y&lt;/span> both true?&lt;/td>
+&lt;/tr>
+&lt;tr class="odd">
+&lt;td align="left">&lt;span style="color:green">x or y&lt;/span>&lt;/td>
+&lt;td align="left">is at least one of &lt;span style="color:green">x&lt;/span> and &lt;span style="color:green">y&lt;/span> true?&lt;/td>
+&lt;/tr>
+&lt;tr class="even">
+&lt;td align="left">&lt;span style="color:green">not x&lt;/span>&lt;/td>
+&lt;td align="left">is &lt;span style="color:green">x&lt;/span> false?&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>Now, let’s look at a few examples.&lt;/p>
+&lt;pre class="python">&lt;code>5 &amp;lt; 7&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## True&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>five = 5
+seven = 7
+five &amp;lt; seven&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## True&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>5.0 == 5&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## True&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>5.0 == &amp;#39;5&amp;#39;&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## False&lt;/code>&lt;/pre>
+&lt;/div>
+&lt;/div>
+&lt;div id="lists" class="section level2">
+&lt;h2>Lists&lt;/h2>
+&lt;p>Lists are an important tool used in Python. Lists can contain elements of mixed types as well. Let’s look at a few examples.&lt;/p>
+&lt;pre class="python">&lt;code># List
+list1 = []
+list1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## []&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>list2 = [1, &amp;#39;UBC&amp;#39;, 100]
+list2&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 100]&lt;/code>&lt;/pre>
+&lt;p>Now let’s see a few operations we can perform on a list.&lt;/p>
+&lt;pre class="python">&lt;code>len(list1)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>len(list2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># Indexing Example - we will talk more about this later on
+list2[2]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 100&lt;/code>&lt;/pre>
+&lt;p>Note - Python indexing starts at zero, so the first element in the list is 0, the second is 1, and the third is 2, so if we actually wanted the second element, we would have to do this:&lt;/p>
+&lt;pre class="python">&lt;code>list2[1]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;#39;UBC&amp;#39;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>type(list2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;list&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>type(list2[1])&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## &amp;lt;class &amp;#39;str&amp;#39;&amp;gt;&lt;/code>&lt;/pre>
+&lt;p>As we mentioned earlier, a main difference between lists and tuples is that lists are mutable. Mutable means that elements in a list can be appended, changed, or deleted.&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list = [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;]
+mixed_list.append(&amp;#39;New&amp;#39;)
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;, &amp;#39;New&amp;#39;]&lt;/code>&lt;/pre>
+&lt;p>If we decided that we wanted to replace ‘New’ with 4, we could do so like this:&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list[4]= 4
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, &amp;#39;UBC&amp;#39;, 5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre>
+&lt;p>If we wanted to remove elements from the list, we could do so like this:&lt;/p>
+&lt;pre class="python">&lt;code>mixed_list.remove(&amp;#39;UBC&amp;#39;)
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [1, 5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre>
+&lt;p>Note that this will only remove the first occurrence, if this happened to be in the list more than once. It would also call an error message if the element doesn’t exist.&lt;/p>
+&lt;p>If we wanted to remove it based on the index of the list:&lt;/p>
+&lt;pre class="python">&lt;code>del mixed_list[0]
+mixed_list&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [5.0, &amp;#39;1&amp;#39;, 4]&lt;/code>&lt;/pre>
+&lt;/div>
+&lt;div id="dictionaries" class="section level2">
+&lt;h2>Dictionaries&lt;/h2>
+&lt;p>A dictionary lists key-value pairs, which could also be thought of as associated values where a key matches to the associated value. Let’s look at a few examples.&lt;/p>
+&lt;pre class="python">&lt;code># Dictionary - mapping between values
+house = {&amp;#39;bedrooms&amp;#39;: 3, &amp;#39;bathrooms&amp;#39;: 2,
+&amp;#39;city&amp;#39;: &amp;#39;Kelowna&amp;#39;, &amp;#39;price&amp;#39;: 250000}&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>house[&amp;#39;price&amp;#39;]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 250000&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>course = {&amp;#39;Data Science&amp;#39;: [&amp;#39;DATA100&amp;#39;, &amp;#39;DATA200&amp;#39;, &amp;#39;DATA300&amp;#39;],
+&amp;#39;Science&amp;#39;: [&amp;#39;SCIENCE100&amp;#39;, &amp;#39;SCIENCE200&amp;#39;, &amp;#39;SCIENCE300&amp;#39;]}&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>course[&amp;#39;Data Science&amp;#39;]&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## [&amp;#39;DATA100&amp;#39;, &amp;#39;DATA200&amp;#39;, &amp;#39;DATA300&amp;#39;]&lt;/code>&lt;/pre>
+&lt;/div>
+&lt;div id="loops" class="section level2">
+&lt;h2>Loops&lt;/h2>
+&lt;p>Loops are a common tool used in Python to help users iterate through lists, or perform the same operation numerous times without added efforts.&lt;/p>
+&lt;p>Let’s look at a few examples:&lt;/p>
+&lt;pre class="python">&lt;code># Loops
+for n in [0, 1, 5, 2, -5]:
+# this is inside the loop
+print(&amp;quot;The number is&amp;quot;, n, &amp;quot;and its squared value is&amp;quot;, n**2)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## The number is 0 and its squared value is 0
+## The number is 1 and its squared value is 1
+## The number is 5 and its squared value is 25
+## The number is 2 and its squared value is 4
+## The number is -5 and its squared value is 25&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># this is outside the loop&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>## Loop
+s = &amp;quot;Python&amp;quot;
+for c in s:
+print(c + &amp;quot;!&amp;quot;)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## P!
+## y!
+## t!
+## h!
+## o!
+## n!&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code># range(10) sets values 0-9, because recall Python starts at 0, not 1
+for i in range(10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9&lt;/code>&lt;/pre>
+&lt;p>This is equivalent to writing:&lt;/p>
+&lt;pre class="python">&lt;code>for i in range(0,10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9&lt;/code>&lt;/pre>
+&lt;p>If we wanted it to start at 1 and go to 10 (inclusive), we would write:&lt;/p>
+&lt;pre class="python">&lt;code>for i in range(1,11):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 1
+## 2
+## 3
+## 4
+## 5
+## 6
+## 7
+## 8
+## 9
+## 10&lt;/code>&lt;/pre>
+&lt;p>Other examples:&lt;/p>
+&lt;pre class="python">&lt;code>#(start,end,increments)
+for i in range(0,101,10):
+print(i)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 0
+## 10
+## 20
+## 30
+## 40
+## 50
+## 60
+## 70
+## 80
+## 90
+## 100&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>n = 3
+while n &amp;gt; 0:
+print(n)
+n = n - 1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3
+## 2
+## 1&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>print(&amp;quot;Smile!&amp;quot;)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## Smile!&lt;/code>&lt;/pre>
+&lt;/div>
+&lt;div id="data-frames" class="section level2">
+&lt;h2>Data Frames&lt;/h2>
+&lt;p>A data frame essentially functions as a series of connected vectors or lists, where each vector or list is a column. In this sense a data frame is also a special kind of list.&lt;/p>
+&lt;p>In a data frame, all vectors need to be of the same length. And while each vector must hold the same data type, not all vectors need to be of the same data type. Data frames also allow us to apply column names.&lt;/p>
+&lt;p>Let’s look at an example of creating a dataframe from two lists.&lt;/p>
+&lt;pre class="python">&lt;code>letter_list = [&amp;#39;a&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;c&amp;#39;, &amp;#39;d&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;f&amp;#39;, &amp;#39;g&amp;#39;, &amp;#39;h&amp;#39;, &amp;#39;i&amp;#39;]
+number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+import pandas as pd
+df = pd.DataFrame(
+{&amp;#39;Letters&amp;#39;: letter_list,
+&amp;#39;Numbers&amp;#39;: number_list})
+df&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## Letters Numbers
+## 0 a 1
+## 1 b 2
+## 2 c 3
+## 3 d 4
+## 4 e 5
+## 5 f 6
+## 6 g 7
+## 7 h 8
+## 8 i 9&lt;/code>&lt;/pre>
+&lt;p>Alternatively, you could write a data frame directly like this:&lt;/p>
+&lt;pre class="python">&lt;code>df1 = pd.DataFrame({&amp;#39;x&amp;#39; : [1., 2., 3., 4.],
+&amp;#39;y&amp;#39; : [4., 3., 2., 1.],
+&amp;#39;z&amp;#39; : [1, 2, 3, 4]})
+df1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## x y z
+## 0 1.0 4.0 1
+## 1 2.0 3.0 2
+## 2 3.0 2.0 3
+## 3 4.0 1.0 4&lt;/code>&lt;/pre>
+&lt;p>Data frames are a VERY powerful data type in Python. We will spend most of our remaining time working with data frames because there is so much to learn about.&lt;/p>
+&lt;/div></description></item><item><title>Introduction to Python</title><link>https://csc-ubc-okanagan.github.io/CSC-Blog/p/introduction-to-python/</link><pubDate>Wed, 15 Feb 2023 09:00:00 -0800</pubDate><guid>https://csc-ubc-okanagan.github.io/CSC-Blog/p/introduction-to-python/</guid><description>
+&lt;div id="python-can-be-used-as-a-calculator" class="section level2">
+&lt;h2>Python can be used as a calculator&lt;/h2>
+&lt;pre class="python">&lt;code>1 + 1&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 2&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>2-3&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## -1&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>6 / 2&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3.0&lt;/code>&lt;/pre>
+&lt;pre class="python">&lt;code>3 * 4&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 12&lt;/code>&lt;/pre>
+&lt;p>Since Python is so widely used, there are many people who contribute to continuously improving and developing it. Let’s imagine Python as a base version. It can do basic calculations, but it requires extra efforts to do more complicated things. People have created extras or add-ons to help create shortcuts for more complicated specific tasks or functions. These ‘add-ons’ are called packages. Packages can be imported to use to help make things easier. For example, there is a Python package called math that helps with basic mathematical operations. Let’s look at an example here of calling the package using the &lt;code>import&lt;/code> command.&lt;/p>
+&lt;pre class="python">&lt;code>import math
+math.sqrt(9)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 3.0&lt;/code>&lt;/pre>
+&lt;p>Once it has been imported, it does not need to be re-imported for the rest of this document. You can also import multiple packages within the same document. We will get into more useful packages later on!&lt;/p>
+&lt;pre class="python">&lt;code>math.log(100)&lt;/code>&lt;/pre>
+&lt;pre>&lt;code>## 4.605170185988092&lt;/code>&lt;/pre>
+&lt;p>For now, practice typing basic calculations into your Python terminal to get used to the syntax, and see how easy it is to calculate things!&lt;/p>
+&lt;/div></description></item></channel></rss>
