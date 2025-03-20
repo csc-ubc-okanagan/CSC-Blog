@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, fig.width = 8, fig.height = 
 
 <!-- This blog covers data transformations in `R`. If you use `Python`, see [this post](needs-a-url). -->
 
-# Transforming response variables
+## Transforming response variables
 
 Data transformations are often taught in introductory quantitative and statistics courses as methods for dealing with non-Gaussian (i.e., not normal) data, whether it be bounded (e.g, strictly positive) or skewed ([https://ubco-biology.github.io/BIOL202/transform.html](https://ubco-biology.github.io/BIOL202/transform.html); [https://ubco-biology.github.io/BIOL202/LSR.html#transform-the-data](https://ubco-biology.github.io/BIOL202/LSR.html#transform-the-data); Section 13.3 in Whitlock & Schluter 2020). In this post, I use simulated data to demonstrate issues that might arise with transforming data. I use a simulated dataset rather than an empirical one so we can compare the model results to the truth.
 
@@ -142,7 +142,7 @@ ggplot() +
 
 From the plot above, we can see that the LM and GLM have fairly similar coefficient estimates and that the `log1p` LM resulted in lower estimates for both. This is due to a systematic bias that occurs when one applies a nonlinear transformation to a random variable, like taking $\$. I explain why in the sections below. Additionally, while the LM's coefficients are reasonable, the 95% [Bayesian Credible Intervals](https://en.wikipedia.org/wiki/Credible_interval) (BCIs) for the post-intervention estimate are not appropriate because they include negative values. In contrast, the GLM's BCIs are asymmetric: they are shorter below the mean and longer above the mean. This is recognizes that a multiplicative change for large values is larger than one for small values: a 50% decrease will take 2 to 1 and take 4 to 2. Consequently, asymmetric BCIs provide a better representation of the model's uncertainty.
 
-# Linear and nonlinear transformations
+## Linear and nonlinear transformations
 
 I want to end this section by explaining the difference between linear and nonlinear transformations and how the two impact modeling. Linear transformations include all transformations that can be written as a series of additions, subtractions, multiplications, or divisions. Formally, they have the form $Y_t = (aY + b)$, where $Y$ is our original response variable of interest, $a$ and $b$ are any number (but $a \ne 0$), and $Y_t$ is the transformed response. These transformations are called "linear" because the operations of addition, subtraction, multiplication and division only shift distributions left and right (addition and subtraction) or expand and shrink distributions (multiplication and division), so $Y_t$ and $Y$ follow a linear relationship for any finite and nonzero value of $a$ and any finite value of $b$:
 
@@ -165,10 +165,10 @@ expand_grid(Y = Y,
   ggplot(aes(Y, Y_star)) +
   facet_wrap(~ trans, scales = 'free_y') +
   geom_line() +
-  labs(x = 'Y', y = expression(Y[t]))
+  labs(x = 'Y', y = expression(bold(Y[t])))
 ```
 
-## Jensen's inequality
+### Jensen's inequality
 
 [Jensen's inequality](https://en.wikipedia.org/wiki/Jensen%27s_inequality) demostrates that if we apply a nonlinear transformation to a random variable, we can't simply back-transform the mean. This is because, if $g()$ is a nonlinear transformation and $g^{-1}()$ is its inverse (e.g, $g() = \log()$ and $g^{-1}()=\exp()$): $$g\big[\mathbb E(Y)\big] \ne \mathbb E\big[g(Y)\big],$$ where $\mathbb E()$ indicates an expected value such that $\mathbb E(Y)=\mu$. This implies that $$\mathbb E(Y) = \mu \ne g^{-1}\bigg\{\mathbb E\big[g(Y)\big]\bigg\}$$.
 
@@ -203,7 +203,7 @@ ggExtra::ggMarginal(
 
 However, note that the transformations only cause bias if applied to random variables. You can apply nonlinear transformations to predictor variables that you assume are measured exactly right. This means that fitting a model of the form $Y = \beta_0 + \beta_1 \log(x_1)$ will not cause issues if you assume $x_1$ is exactly correct with no error (as we often assume). Applying nonlinear transformations on predictors can be useful when a predictor has a distribution with a very long tail, or if one wants to create a variable with diminishing effects (e.g., moving closer to something matters more when you're close and less when you're already far from it). I will make a blog post on this in the future.
 
-# References
+## References
 
 Whitlock M. & Schluter D. (2020). Analysis of biological data, Third edition. Macmillan Learning, New York, NY.
 
