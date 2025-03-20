@@ -12,9 +12,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, fig.width = 8, fig.height = 8, dpi = 300, out.width = '\\linewidth')
-```
+
 
 <!-- This blog covers data transformations in `R`. If you use `Python`, see [this post](needs-a-url). -->
 
@@ -26,10 +24,22 @@ Imagine that a dangerous intersection has been causing frequent accidents betwee
 
 For the sake of this post, let's assume that the mean number of accidents in the 12 months before the intervention was $\lambda_0=2$ per month. In the 12 months after the intervention, the mean number of monthly accidents decreases to $\lambda_1 = 0.4$. We can then simulate data for before and after the intervention as follows:
 
-```{r}
+
+``` r
 library('dplyr')   # for data wrangling
 library('tidyr')   # for data wrangling
 library('mgcv')    # for modeling
+```
+
+```
+## Warning: package 'mgcv' was built under R version 4.4.3
+```
+
+```
+## Warning: package 'nlme' was built under R version 4.4.1
+```
+
+``` r
 library('ggplot2') # for fancy plots
 library('gratia')  # for diagnostic plots in ggplot
 
@@ -53,33 +63,65 @@ ggplot(d) +
   labs(x = 'Accidents per month', y = 'Count')
 ```
 
+<img src="index.en_files/figure-html/unnamed-chunk-1-1.png" width="\linewidth" />
+
 The distribution of the number of monthly accidents is clearly non-Gaussian both before and after the intervention. (*Also note that the number of accidents cannot be negative.*) Still, let's fit a linear model to estimate the mean number of accidents in each period. In this post I use the `mgcv::gam()` function to fit all models for consistency and convenience, but note that you could also use the `stats::lm()` and `stats::glm()` functions, too. After fitting the model, we can look at the estimated change in mean accidents and appraise the model using diagnostic plots.
 
-```{r}
+
+``` r
 m_1 <- gam(accidents ~ period, data = d)
 coef(m_1)
 ```
 
-From the output of the `coef()` function, we can see that the estimated model is $$Y = 1.67 - 1.25\,x_1,$$ where $x_1$ is 0 for before the intervention and 1 for after. The `periodafter` coefficient indicates that there were `r coef(m_1)['periodafter']` less accidents per month after the intervention. While this does not match the true effect of $2 - 0.4 = 1.6$, we should expect some random variation, and the estimate is still reasonable. Longer observational periods would give us more accurate estimates.
+```
+## (Intercept) periodafter 
+##    1.666667   -1.250000
+```
 
-```{r}
+From the output of the `coef()` function, we can see that the estimated model is $$Y = 1.67 - 1.25\,x_1,$$ where $x_1$ is 0 for before the intervention and 1 for after. The `periodafter` coefficient indicates that there were -1.25 less accidents per month after the intervention. While this does not match the true effect of $2 - 0.4 = 1.6$, we should expect some random variation, and the estimate is still reasonable. Longer observational periods would give us more accurate estimates.
+
+
+``` r
 appraise(m_1, point_alpha = 0.3)
 ```
 
+<img src="index.en_files/figure-html/unnamed-chunk-3-1.png" width="\linewidth" />
+
 Those who are used to looking at these plots may recognize two issues: (1) the residuals are not Gaussian (see the q-q plot and the histogram, in the left column), and (2) the variance in the observed values is lower when the predicted mean (linear predictor and fitted values) is lower. One may then decide to log-transform the number of accidents, after adding a small value to avoid taking the log of zero (since $\log(0) = - \infty$).
 
-```{r}
+
+``` r
 # find proportion of months with no accidents
 d %>%
   group_by(period) %>%
   summarize(prop_zero = mean(accidents == 0))
+```
 
+```
+## # A tibble: 2 × 2
+##   period prop_zero
+##   <fct>      <dbl>
+## 1 before     0.167
+## 2 after      0.667
+```
+
+``` r
 # add a variable of log(accidents + 1)
 d$log1p_accidents <- log1p(d$accidents)
 m_2 <- gam(log1p_accidents ~ period, data = d)
 coef(m_2)
+```
+
+```
+## (Intercept) periodafter 
+##   0.8620910  -0.5972532
+```
+
+``` r
 appraise(m_2, point_alpha = 0.3)
 ```
+
+<img src="index.en_files/figure-html/unnamed-chunk-4-1.png" width="\linewidth" />
 
 The `log1p` transformation resulted in a somewhat more symmetrical distribution of residuals, and the mode of the distribution is closer to zero, and improved the issue of non-constant variance (heteroskedasticity). The coefficients are also harder to interpret because they are on the `log1p` scale, since the model is $$\log(Y+1)=0.86 - 0.60 \,x_1.$$
 
@@ -87,11 +129,22 @@ Rather than forcing our response variable to be Gaussian when it isn't (see [thi
 
 The Poisson distribution is a good option because it represents the number of events that occur within a given period of time and location. We can fit a Poisson GLM by specifying the family in the `gam()` function:
 
-```{r}
+
+``` r
 m_3 <- gam(accidents ~ period, data = d, family = poisson(link = 'log'))
 coef(m_3)
+```
+
+```
+## (Intercept) periodafter 
+##   0.5108256  -1.3862944
+```
+
+``` r
 appraise(m_3, point_alpha = 0.3)
 ```
+
+<img src="index.en_files/figure-html/unnamed-chunk-5-1.png" width="\linewidth" />
 
 The output from `coef()` tells us that the GLM is $$\lambda = e{0.51-1.39\,x_1}.$$ This means that after the intervention, the number of accidents decreased to $e^-1.39 * 100%= 0.25%$ what they were in the 12 months before.
 
@@ -99,7 +152,8 @@ With the GLM, we can see a improvement in both the q-q plot and histogram of res
 
 The $\log$ link function (`link = 'log'`) allows us to create a model that will only give us non-negative numbers of accidents by having the form $$\log(\lambda) = 0.51-1.39 \, x_1,$$ which we can re-write as $$\lambda = e^{ 0.51-1.39 \, x_1}.$$ Notice that while this model may look similar to the `log1p` model, the $\log$ function is applied to $\lambda$, the mean of $Y$, rather than to $Y$ directly. This is important because it removes the systematic bias that results from applying non-linear transformations such as $\log(Y)$, $\sqrt{Y}$, and $\arcsin\left(\sqrt{Y}\right)$ to a random variable. Now that we have three models, let's compare between the predictions that the tree give us:
 
-```{r}
+
+``` r
 # predictions
 pred <- function(model, model_type) {
   p <- predict(model, newdata = newdata, se.fit = TRUE) %>%
@@ -142,20 +196,26 @@ ggplot() +
   khroma::scale_color_highcontrast(name = 'Model')
 ```
 
+<img src="index.en_files/figure-html/unnamed-chunk-6-1.png" width="\linewidth" />
+
 From the plot above, we can see that the LM and GLM have fairly similar coefficient estimates and that the `log1p` LM resulted in lower estimates for both. This is due to a systematic bias that occurs when one applies a nonlinear transformation to a random variable, like $\log(Y)$. I explain why in the sections below. Additionally, while the LM's coefficients are reasonable, the 95% [Bayesian Credible Intervals](https://en.wikipedia.org/wiki/Credible_interval) (BCIs) for the post-intervention estimate are not appropriate because they include negative values. In contrast, the GLM's BCIs are asymmetric: they are shorter below the mean and longer above the mean. This is recognizes that a multiplicative change for large values is larger than one for small values: a 50% decrease will take 2 to 1 and take 4 to 2. Consequently, asymmetric BCIs provide a better representation of the model's uncertainty.
 
 ## Linear and nonlinear transformations
 
 I want to end this section by explaining the difference between linear and nonlinear transformations and how the two impact modeling. Linear transformations include all transformations that can be written as a series of additions, subtractions, multiplications, or divisions. Formally, they have the form $Y_t = (aY + b)$, where $Y$ is our original response variable of interest, $a$ and $b$ are any number (but $a \ne 0$), and $Y_t$ is the transformed response. These transformations are called "linear" because the operations of addition, subtraction, multiplication and division only shift distributions left and right (addition and subtraction) or expand and shrink distributions (multiplication and division), so $Y_t$ and $Y$ follow a linear relationship for any finite and nonzero value of $a$ and any finite value of $b$:
 
-```{r}
+
+``` r
 Y <- seq(0.01, 2, by = 1e-3)
 ggplot() + geom_line(aes(Y, Y/10 + 3))
 ```
 
+<img src="index.en_files/figure-html/unnamed-chunk-7-1.png" width="\linewidth" />
+
 Conversely, nonlinear transformations are all transformations that cannot be written using only addition, subtraction, multiplications, or division. If we were to plot any of these functions, we would see a nonlinear relationship between the original and transformed values:
 
-```{r}
+
+``` r
 expand_grid(Y = Y,
             trans = c('Y / 10 + 3', 'log(Y)', 'sqrt(Y)',
                       'arcsin(sqrt(Y))')) %>%
@@ -170,13 +230,23 @@ expand_grid(Y = Y,
   labs(x = 'Y', y = expression(bold(Y[t])))
 ```
 
+```
+## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `Y_star = case_when(...)`.
+## Caused by warning in `asin()`:
+## ! NaNs produced
+```
+
+<img src="index.en_files/figure-html/unnamed-chunk-8-1.png" width="\linewidth" />
+
 ### Jensen's inequality
 
 [Jensen's inequality](https://en.wikipedia.org/wiki/Jensen%27s_inequality) demostrates that if we apply a nonlinear transformation to a random variable, we can't simply back-transform the mean. This is because, if $g()$ is a nonlinear transformation and $g^{-1}()$ is its inverse (e.g, $g() = \log()$ and $g^{-1}()=\exp()$): $$g\big[\mathbb E(Y)\big] \ne \mathbb E\big[g(Y)\big],$$ where $\mathbb E()$ indicates an expected value such that $\mathbb E(Y)=\mu$. This implies that $$\mathbb E(Y) = \mu \ne g^{-1}\bigg\{\mathbb E\big[g(Y)\big]\bigg\}.$$
 
 Here is a graphical example to help you visualize why. The green vertical line is the estimated mean (i.e., what we're usually interested in), the blue line is the estimated mean of the square-root transformed $Y$, and the blue line is the back-transformed estimated mean of the square-root transformed $Y$. The black line is the estimated bias.
 
-```{r}
+
+``` r
 set.seed(2024-10-7)
 Y <- rpois(n = 250, lambda = 1)
 
@@ -202,6 +272,8 @@ ggExtra::ggMarginal(
   fill = 'grey', type = 'histogram', xparams = list(bins = 5),
   yparams = list(bins = 5))
 ```
+
+<img src="index.en_files/figure-html/unnamed-chunk-9-1.png" width="\linewidth" />
 
 However, note that the transformations only cause bias if applied to random variables. You can apply nonlinear transformations to predictor variables that you assume are measured exactly right. This means that fitting a model of the form $Y = \beta_0 + \beta_1 \log(x_1)$ will not cause issues if you assume $x_1$ is exactly correct with no error (as we often assume). Applying nonlinear transformations on predictors can be useful when a predictor has a distribution with a very long tail, or if one wants to create a variable with diminishing effects (e.g., moving closer to something matters more when you're close and less when you're already far from it). I will make a blog post on this in the future.
 
