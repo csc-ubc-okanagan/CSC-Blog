@@ -1,0 +1,1306 @@
+---
+title: "Abacus API"
+subtitle: "Search & Data Access"
+author: "Mathew Vis-Dunbar & Nick Rochlin"
+date: "2025-02-14"
+categories: [R, API]
+tags: [R, rstudio] # tags always lowercase
+always_allow_html: yes
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/kePrint/kePrint.js"></script>
+<link href="{{< blogdown/postref >}}index.en_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="definitions" class="section level2">
+<h2>Definitions</h2>
+<p><strong>API</strong></p>
+<p>An application programming interface (API) is a formalized way of interacting with another piece of hardware or software without needing to know how that hardware or software actually works. As such, it is a convenient method of making requests to get, update, or push information between your system and the remote system. As a loose analogy, you can think of this as a menu in a resuraunt; you don’t need to know how the kitchen makes your food, but you need to know what you can ask for from your server. When you want scrambled eggs, you don’t need to go into the kitchen and make these from scratch, you simply put in a request based on the options on the menu.</p>
+<p><strong>JSON</strong></p>
+<p>JavaScript Object Notation (JSON) is a method for storing and transmitting data primarily using key value pairs. It is compact, flexible, human readable, and works well in a Web based environment. It is generally the default format in which data is transmitted from an API.</p>
+</div>
+<div id="set-up" class="section level2">
+<h2>Set up</h2>
+<p>The Abacus API is accessible through http, which means we can access the API using any http compliant tool, including a web browser.</p>
+<p>By default, the API returns data in JSON notation. One of the issues we have when working in <code>R</code> is that <code>R</code> excels with rectangular data, especially if working in the <code>Tidyverse</code>. So we need to wrangle the JSON formatted data into a data structure more amenable to R. This begins by moving content into a list after which we can transition it to a dataframe, or tibble, as needed.</p>
+<p>To do this all, we’ll use the following four libraries, although, as we’ll see later, we can get away with just the <code>httr2</code> package:</p>
+<pre class="r"><code>library(httr2) # http protocols
+library(jsonlite) # json to r data structures</code></pre>
+</div>
+<div id="steps" class="section level2">
+<h2>Steps</h2>
+<p>In the proceding sections we’ll cover the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Using the <code>search</code> API to look for relevant datasets.</li>
+<li>Plugging a unique ID associated with the dataset(s) of interest into the <code>datasets</code> api to identify the files of interest. This involves first identifying a new unique ID for each dataset, only accessible through the <code>datasets</code> API, and the version of the dataset we’re interested in (an Abacus record is version controlled).</li>
+<li>We will then use the urls associated with the data files to download the relevant data.</li>
+</ol>
+<p>We will be working with the Statistics Canada Labour Force Surveys for this exercise.</p>
+</div>
+<div id="caveats" class="section level2">
+<h2>Caveats</h2>
+<p>This is a simplified overview of API interactions. So, for example, we will not be doing any error handling, nor will we deal with using authentication tokens. But these are easily built in once the general approach is understood, and the <code>httr2</code> package has functions for handling these things.</p>
+</div>
+<div id="building-the-connection" class="section level2">
+<h2>Building the Connection</h2>
+<p>Abacus is built on a Dataverse instance. You can <a href="https://guides.dataverse.org/en/latest/api/index.html">refer to the Dataverse API documentation</a> for more information on interacting with the API.</p>
+<p>Abacus has more than one API. This is common when interacting with APIs. Each API gives you access to certain functionalities and returns certain pieces of data. Here, we’ll review the <code>search</code> and <code>datasets</code> APIs; the former to locate content, the latter to retrieve that content. We will ultimately use the <code>access</code> API with <code>download.file()</code> to acquire the data.</p>
+<p>In either case, we start with the base url into the API, which we’ll store in a variable.</p>
+<pre class="r"><code>base_url &lt;- &quot;https://abacus.library.ubc.ca/api/&quot;</code></pre>
+<p>Next, we can add on the specific API we intend to search.</p>
+<pre class="r"><code>search_api &lt;- &quot;search?q=&quot;</code></pre>
+<p>The <code>search</code> API requires a <code>query</code> parameter, ie, something to search for. This is articulated as a string, following the <code>?q=</code>.</p>
+<p>Note: When using the <code>httr2</code> package, if the query string is multi-word, spaces need to be filled with <code>%20</code>. For example, a search for <code>labour force</code> will fail, and need to be replaced with <code>labour%20force</code>.</p>
+</div>
+<div id="search-api" class="section level2">
+<h2>Search API</h2>
+<p>There are a variety of fields and file types that we can search through the search API, noting that, as a data repository, objects in Abacus are organized into dataverses, datasets, and files, where datasets reside in dataverses, and files within datasets. Datasets provide a high level overview of the data they hold, including descriptions, number of files, who produced the files, when they were uploaded, etc.</p>
+<p>We’ve already built our <code>base_url</code> and added on the requisite text to access the <code>search</code> API, <code>search_api</code>. We’ll now build our query, specifying the query and the file type of interest, ie, do we want to search for a dataverse, dataset, or file.</p>
+<pre class="r"><code>search_query &lt;- &quot;title:labour&quot; # retrieve everything with the word labour in the title
+search_type &lt;- &quot;&amp;type=dataset&quot; # limit to datasets</code></pre>
+<p>We can then paste these together to construct a full query.</p>
+<pre class="r"><code>(search_api_call &lt;- paste0(base_url, search_api, search_query, search_type))</code></pre>
+<pre><code>## [1] &quot;https://abacus.library.ubc.ca/api/search?q=title:labour&amp;type=dataset&quot;</code></pre>
+<p>To get a sense of what this looks like, we can load this query in our browser.</p>
+</div>
+<div id="implementing-the-search-in-r" class="section level2">
+<h2>Implementing the Search in <code>R</code></h2>
+<p>The <code>hhtr2</code> package will allow us to make http requests from within <code>R</code>. The steps involved including:</p>
+<ol style="list-style-type: lower-alpha">
+<li>building a request; and then</li>
+<li>performing that request, which results in some data being sent back to us.</li>
+</ol>
+<p>These two steps are done, respectively, with the <code>request()</code> and <code>req_perform()</code> functions. We feed our <code>search_api_call</code> into the <code>request()</code> and then feed the result into the <code>req_preform</code>.</p>
+<pre class="r"><code>search_resp &lt;- search_api_call |&gt;
+  httr2::request() |&gt;
+  httr2::req_perform()</code></pre>
+<p>What we get back is the same as what we saw in our browser, formatted as a list.</p>
+<pre class="r"><code>str(search_resp)</code></pre>
+<pre><code>## List of 7
+##  $ method     : chr &quot;GET&quot;
+##  $ url        : chr &quot;https://abacus.library.ubc.ca/api/search?q=title:labour&amp;type=dataset&quot;
+##  $ status_code: int 200
+##  $ headers    :List of 8
+##   ..$ Date                        : chr &quot;Mon, 24 Mar 2025 22:49:27 GMT&quot;
+##   ..$ Server                      : chr &quot;Apache/2.4.37 (Red Hat Enterprise Linux) OpenSSL/1.1.1k mod_R/1.2.9 R/3.5.0 mod_apreq2-20101207/2.8.1&quot;
+##   ..$ X-Frame-Options             : chr &quot;SAMEORIGIN&quot;
+##   ..$ Access-Control-Allow-Origin : chr &quot;*&quot;
+##   ..$ Access-Control-Allow-Methods: chr &quot;PUT, GET, POST, DELETE, OPTIONS&quot;
+##   ..$ Access-Control-Allow-Headers: chr &quot;Accept, Content-Type, X-Dataverse-Key&quot;
+##   ..$ Content-Type                : chr &quot;application/json;charset=UTF-8&quot;
+##   ..$ Transfer-Encoding           : chr &quot;chunked&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;httr2_headers&quot;
+##  $ body       : raw [1:24871] 7b 22 73 74 ...
+##  $ request    :List of 7
+##   ..$ url     : chr &quot;https://abacus.library.ubc.ca/api/search?q=title:labour&amp;type=dataset&quot;
+##   ..$ method  : NULL
+##   ..$ headers : list()
+##   ..$ body    : NULL
+##   ..$ fields  : list()
+##   ..$ options : list()
+##   ..$ policies: list()
+##   ..- attr(*, &quot;class&quot;)= chr &quot;httr2_request&quot;
+##  $ cache      :&lt;environment: 0x10ebe7b68&gt; 
+##  - attr(*, &quot;class&quot;)= chr &quot;httr2_response&quot;</code></pre>
+<p>What we’re most interested in here is the <code>body</code>. However, the <code>body</code> is sent to us structured as json and in raw bytes. This is generally the case with an API response. <code>httr2</code> has a built in function for converting the body from raw to something <code>R</code> can work with – <code>resp_body_json()</code> – and we’ll use this later, but we’ll start with the <code>jsonlite</code> package to explore this process step by step.</p>
+<pre class="r"><code>summary(search_resp$body)</code></pre>
+<pre><code>## Length  Class   Mode 
+##  24871    raw    raw</code></pre>
+<p>Since we only want the <code>body</code> going forward, we’ll isolate this.</p>
+<pre class="r"><code>search_body &lt;- search_resp$body</code></pre>
+</div>
+<div id="data-wrangling" class="section level2">
+<h2>Data Wrangling</h2>
+<p>Our first task is to convert this raw data to character data. We can do this with <code>rawToChar</code>.</p>
+<pre class="r"><code>search_body_char &lt;- rawToChar(search_body)</code></pre>
+<p>We’re presented with a vector of length one, which if we print out the first bit of, does not look very friendly.</p>
+<pre class="r"><code>summary(search_body_char)</code></pre>
+<pre><code>##    Length     Class      Mode 
+##         1 character character</code></pre>
+<pre class="r"><code>str(search_body_char)</code></pre>
+<pre><code>##  chr &quot;{\&quot;status\&quot;:\&quot;OK\&quot;,\&quot;data\&quot;:{\&quot;q\&quot;:\&quot;title:labour\&quot;,\&quot;total_count\&quot;:110,\&quot;start\&quot;:0,\&quot;spelling_alternatives\&quot;:{&quot;| __truncated__</code></pre>
+<p>This looks a little friendlier with <code>cat()</code></p>
+<pre class="r"><code># not executed
+cat(search_body_char)</code></pre>
+<p>Our next task then, is to convert this JSON notation to a suitable <code>R</code> data structure, in this case, a list. We’ll do this with the <code>jsonlite</code> package.</p>
+<pre class="r"><code>search_body_list &lt;- jsonlite::fromJSON(search_body_char)</code></pre>
+<p>If we look at how this has been converted, we can see it’s a list of two.</p>
+<pre class="r"><code>summary(search_body_list)</code></pre>
+<pre><code>##        Length Class  Mode     
+## status 1      -none- character
+## data   6      -none- list</code></pre>
+<p>The <code>data</code> list is what we want. We’ll pull that out and then explore that list.</p>
+<pre class="r"><code>search_data &lt;- search_body_list$data
+summary(search_data)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Length
+</th>
+<th style="text-align:left;">
+Class
+</th>
+<th style="text-align:left;">
+Mode
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+q
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+total_count
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+start
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+spelling_alternatives
+</td>
+<td style="text-align:left;">
+0
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+list
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+items
+</td>
+<td style="text-align:left;">
+27
+</td>
+<td style="text-align:left;">
+data.frame
+</td>
+<td style="text-align:left;">
+list
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+count_in_response
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+</tr>
+</tbody>
+</table>
+<p>We’re slowly whittling this down. This now looks almost identical to what we pulled up in our browser earlier. The actual relevant content is in the <code>items</code> list. But we’ll also need the <code>total_count</code> for when we need to request all the data from the server in a loop. For now, let’s look at the 26 items in there.</p>
+<pre class="r"><code>names(search_data$items)</code></pre>
+<pre><code>##  [1] &quot;name&quot;                    &quot;type&quot;                   
+##  [3] &quot;url&quot;                     &quot;global_id&quot;              
+##  [5] &quot;description&quot;             &quot;published_at&quot;           
+##  [7] &quot;publisher&quot;               &quot;citationHtml&quot;           
+##  [9] &quot;identifier_of_dataverse&quot; &quot;name_of_dataverse&quot;      
+## [11] &quot;citation&quot;                &quot;storageIdentifier&quot;      
+## [13] &quot;keywords&quot;                &quot;subjects&quot;               
+## [15] &quot;fileCount&quot;               &quot;versionId&quot;              
+## [17] &quot;versionState&quot;            &quot;majorVersion&quot;           
+## [19] &quot;minorVersion&quot;            &quot;createdAt&quot;              
+## [21] &quot;updatedAt&quot;               &quot;contacts&quot;               
+## [23] &quot;producers&quot;               &quot;relatedMaterial&quot;        
+## [25] &quot;geographicCoverage&quot;      &quot;authors&quot;                
+## [27] &quot;publications&quot;</code></pre>
+<p>We don’t need all this data. We should be able to do some evaluation with the <code>name</code>, <code>description</code>, <code>fileCount</code>, <code>producers</code>, <code>published_at</code>, <code>url</code>, and, for later retrieval, <code>global_id</code>. Let’s look at these quickly, noting importantly, that <code>producers</code> is another list, that we’ll need to wrangle some how.</p>
+<pre class="r"><code>vars_of_interest &lt;- c(&quot;name&quot;, &quot;description&quot;, &quot;fileCount&quot;, &quot;producers&quot;, &quot;published_at&quot;, &quot;url&quot;, &quot;global_id&quot;)
+lapply(search_data$items[vars_of_interest], class) # show the class of each list item</code></pre>
+<pre><code>## $name
+## [1] &quot;character&quot;
+## 
+## $description
+## [1] &quot;character&quot;
+## 
+## $fileCount
+## [1] &quot;integer&quot;
+## 
+## $producers
+## [1] &quot;list&quot;
+## 
+## $published_at
+## [1] &quot;character&quot;
+## 
+## $url
+## [1] &quot;character&quot;
+## 
+## $global_id
+## [1] &quot;character&quot;</code></pre>
+</div>
+<div id="getting-all-the-data" class="section level2">
+<h2>Getting All the Data</h2>
+<p>At this stage, we have what we need to pull search results from Abacus. You’ll note that the search returned a result set of 109, but only 10 items:</p>
+<pre class="r"><code>(search_body_list$data$total_count)</code></pre>
+<pre><code>## [1] 110</code></pre>
+<pre class="r"><code>(nrow(search_body_list$data$items))</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>Going forward, we need to paginate through the result set to retrieve all the items.</p>
+<p>A few things to note:</p>
+<ul>
+<li>By default, the <code>search</code> API returns 10 results per request. It allows for a maximum of 1000 per request. This is handled in the <code>per_page</code> parameter.</li>
+<li>There is a start parameter that we can feed into the request; this indicates which record to start retrieving data from. This number will need to be updated as we iterate over our requests, for example, if in the first call we pull records 1:1000, in the second call, we need to start at 1001. This is handled in the <code>start</code> parameter.</li>
+<li><code>R</code> starts counting at 1, other languages start at 0, so the first record returned by the API is indexed at 0 on the server, not 1.</li>
+<li>APIs will have a limit on the number of requests you can make in any given time span. We’ll build in a simple delay using <code>Sys.Sleep()</code>, but <code>httr2</code> has a built in function for handling this as well.</li>
+</ul>
+<p>Below is a function with the above steps built into it. It takes two arguments, a search string and the number of results to retrieve per request. It also prints some progress information to the console.</p>
+<pre class="r"><code>search_datasets &lt;- function(query, per_page) {
+  # Build the query
+  url &lt;- paste0(&quot;https://abacus.library.ubc.ca/api/search?q=&quot;, query, &quot;&amp;type=dataset&quot;)
+  
+  # Initial call to figure out total records
+  resp &lt;- url |&gt;
+    httr2::request() |&gt;
+    httr2::req_perform()
+  resp_body &lt;- jsonlite::fromJSON(rawToChar(resp$body))
+  total_count &lt;- resp_body$data$total_count
+  
+  # Give some feedback
+  cat(paste0(&quot;There are &quot;, total_count, &quot; records to be fetched.\n&quot;, &quot;Fetching &quot;, per_page, &quot; records per call.\nThis will require &quot;, ceiling(total_count/per_page), &quot; calls.\n\n&quot;))
+  
+  # build place holders for loop
+  name &lt;- vector()
+  description &lt;- vector()
+  file_count &lt;- vector()
+  producers &lt;- list()
+  pub_date &lt;- vector()
+  global_id &lt;- vector()
+  handle &lt;- vector()
+  
+  # establish the starting point
+  start_point &lt;- 0
+  
+  # create a counter for tracking calls
+  call_counter &lt;- 1
+  
+  # run the loop
+  while(length(handle) &lt; total_count) { # while the number of retrieved records is &lt; the total count
+    cat(paste0(&quot;Call &quot;, call_counter, &quot;\n&quot;)) # Indicate what call we&#39;re on to the API
+    req &lt;- httr2::request(paste0(url, &quot;&amp;start=&quot;, start_point, &quot;&amp;per_page=&quot;, per_page)) # create the request
+    resp &lt;- httr2::req_perform(req) # perform the request
+    resp_body &lt;- jsonlite::fromJSON(rawToChar(resp$body)) # convert the body from raw JSON to a list
+    resp_body_name &lt;- resp_body$data$items$name # get the name
+    resp_body_desc &lt;- resp_body$data$items$description # get the description
+    resp_body_file_count &lt;- resp_body$data$items$fileCount # get the file count
+    resp_body_producers &lt;- resp_body$data$items$producers # get the producers
+    resp_body_handle &lt;- resp_body$data$items$url #get the url
+    resp_body_global_id &lt;- resp_body$data$items$global_id # get id
+    resp_body_pubdate &lt;- resp_body$data$items$published_at # get update date
+    # update the place holders:
+    name &lt;- c(name, resp_body_name)
+    description &lt;- c(description, resp_body_desc)
+    file_count &lt;- c(file_count, resp_body_file_count)
+    producers &lt;- c(producers, resp_body_producers)
+    pub_date &lt;- c(pub_date, resp_body_pubdate)
+    handle &lt;- c(handle, resp_body_handle)
+    global_id &lt;- c(global_id, resp_body_global_id)
+    # update counters
+    start_point &lt;- start_point + per_page # increment the start_point
+    call_counter &lt;- call_counter + 1 # increment the counter
+    Sys.sleep(.1) # pause before making a new call
+  }
+  # When all is said and done, compile the place holders into a list and return this object
+    return(list(&quot;name&quot; = name,
+                &quot;description&quot; = description,
+                &quot;file_count&quot; = file_count,
+                &quot;producers&quot; = producers,
+                &quot;pub_date&quot; = pub_date,
+                &quot;handle&quot; = handle,
+                &quot;global_id&quot; = global_id))
+}</code></pre>
+<p>We can then call that function, here adding an additional parameter indicating that we only want to search the title and that we want 50 results per query. We’re being specifically broad with our search.</p>
+<pre class="r"><code>labour &lt;- search_datasets(&quot;title:labour&quot;, 50)</code></pre>
+<pre><code>## There are 110 records to be fetched.
+## Fetching 50 records per call.
+## This will require 3 calls.
+## 
+## Call 1
+## Call 2
+## Call 3</code></pre>
+<p>We now have record data that we can explore.</p>
+<pre class="r"><code>summary(labour)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+Length
+</th>
+<th style="text-align:left;">
+Class
+</th>
+<th style="text-align:left;">
+Mode
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+name
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+description
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+file_count
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+producers
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+list
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+pub_date
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+handle
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+global_id
+</td>
+<td style="text-align:left;">
+110
+</td>
+<td style="text-align:left;">
+-none-
+</td>
+<td style="text-align:left;">
+character
+</td>
+</tr>
+</tbody>
+</table>
+<p>We can make this a bit easier for ourselves by converting this into a dataframe or tibble. There are several ways to approach this, considering that <code>producers</code> is a list – it is a list as some records have more than one producer associated them. Here, I’ll treat datasets with multiple producers as a different record authority than if one of these co-producers produced a standalone dataset. To do this, we’ll first collapse the <code>producers</code> nested lists, and then flatten the result into a single list.</p>
+<pre class="r"><code>labour$producers &lt;- labour$producers |&gt;
+  lapply(function(x) paste(x, collapse = &quot;, &quot;)) |&gt;
+  unlist()
+
+head(labour$producers, n = 20)</code></pre>
+<pre><code>##  [1] &quot;Statistics Canada. Labour Force Survey Division&quot;
+##  [2] &quot;Statistics Canada. Labour Force Survey Division&quot;
+##  [3] &quot;Statistics Canada&quot;                              
+##  [4] &quot;Statistics Canada&quot;                              
+##  [5] &quot;Statistics Canada&quot;                              
+##  [6] &quot;Statistics Canada&quot;                              
+##  [7] &quot;Statistics Canada&quot;                              
+##  [8] &quot;Statistics Canada&quot;                              
+##  [9] &quot;Statistics Canada&quot;                              
+## [10] &quot;Statistics Canada&quot;                              
+## [11] &quot;Statistics Canada&quot;                              
+## [12] &quot;Statistics Canada&quot;                              
+## [13] &quot;Statistics Canada&quot;                              
+## [14] &quot;Statistics Canada&quot;                              
+## [15] &quot;Statistics Canada&quot;                              
+## [16] &quot;Statistics Canada&quot;                              
+## [17] &quot;Statistics Canada&quot;                              
+## [18] &quot;Statistics Canada&quot;                              
+## [19] &quot;Statistics Canada&quot;                              
+## [20] &quot;Statistics Canada&quot;</code></pre>
+<p>We can easily convert this to a dataframe now.</p>
+<pre class="r"><code>labour &lt;- as.data.frame(labour)
+head(labour)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:left;">
+description
+</th>
+<th style="text-align:right;">
+file_count
+</th>
+<th style="text-align:left;">
+producers
+</th>
+<th style="text-align:left;">
+pub_date
+</th>
+<th style="text-align:left;">
+handle
+</th>
+<th style="text-align:left;">
+global_id
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2013
+</td>
+<td style="text-align:left;">
+The Labour Force Survey (LFS) is a household…
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+Statistics Canada. Labour Force Survey Division
+</td>
+<td style="text-align:left;">
+2013-09-10T07:00:00Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/HTSWUF" class="uri">https://hdl.handle.net/11272.1/AB2/HTSWUF</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/HTSWUF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2014
+</td>
+<td style="text-align:left;">
+The Labour Force Survey (LFS) is a household…
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:left;">
+Statistics Canada. Labour Force Survey Division
+</td>
+<td style="text-align:left;">
+2014-01-01T08:00:00Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/SDAVTH" class="uri">https://hdl.handle.net/11272.1/AB2/SDAVTH</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/SDAVTH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2023
+</td>
+<td style="text-align:left;">
+LFS data are used to produce the well-known …
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2024-01-05T17:38:25Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/IJU1QK" class="uri">https://hdl.handle.net/11272.1/AB2/IJU1QK</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/IJU1QK
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2006
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:47:04Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/0B5LPL" class="uri">https://hdl.handle.net/11272.1/AB2/0B5LPL</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/0B5LPL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2008
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:47:20Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/LA3WXI" class="uri">https://hdl.handle.net/11272.1/AB2/LA3WXI</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/LA3WXI
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2007
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:29:41Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/NANO81" class="uri">https://hdl.handle.net/11272.1/AB2/NANO81</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/NANO81
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="explore" class="section level2">
+<h2>Explore</h2>
+<p>We have several datasets with labour in the title. One way of handling exploring this is to strip the dates so that we can look for unique values. First we extract the date:</p>
+<pre class="r"><code>labour$year &lt;- gsub(&quot;.*?([0-9]+).*$&quot;, &quot;\\1&quot;, labour$name) # regex to find ending numbers and storing in a new var
+head(labour$year)</code></pre>
+<pre><code>## [1] &quot;2013&quot; &quot;2014&quot; &quot;2023&quot; &quot;2006&quot; &quot;2008&quot; &quot;2007&quot;</code></pre>
+<p>Then we strip the name:</p>
+<pre class="r"><code>labour$name_no_year &lt;- trimws(gsub(&quot;[[:punct:]]|[[:digit:]]&quot;, &quot;&quot;, labour$name)) # regex to remove punctuation and remaing numbers
+head(labour$name_no_year)</code></pre>
+<pre><code>## [1] &quot;Labour Force Survey&quot; &quot;Labour Force Survey&quot; &quot;Labour Force Survey&quot;
+## [4] &quot;Labour Force Survey&quot; &quot;Labour Force Survey&quot; &quot;Labour Force Survey&quot;</code></pre>
+<p>And then look at the unique values:</p>
+<pre class="r"><code>(unique(labour$name_no_year))</code></pre>
+<pre><code>##  [1] &quot;Labour Force Survey&quot;                                                             
+##  [2] &quot;Survey of Labour and Income Dynamics&quot;                                            
+##  [3] &quot;Cultural Labour Force Survey&quot;                                                    
+##  [4] &quot;Survey of Persons Not in the Labour Force&quot;                                       
+##  [5] &quot;Labour Force Income Profiles&quot;                                                    
+##  [6] &quot;Labour Force Survey Rebased Revised&quot;                                             
+##  [7] &quot;Survey of Labour and Income Dynamics Reweighted&quot;                                 
+##  [8] &quot;Labour Force Survey  revision&quot;                                                   
+##  [9] &quot;Labour Income Profile for selected BC communities&quot;                               
+## [10] &quot;Labour Market Activity Survey&quot;                                                   
+## [11] &quot;Labour force historical review&quot;                                                  
+## [12] &quot;Small Area Business and Labour Database&quot;                                         
+## [13] &quot;Labour Force Historical Review&quot;                                                  
+## [14] &quot;Interwar Labour Database&quot;                                                        
+## [15] &quot;Experienced Labour Force Population by Occupation custom tabulation&quot;             
+## [16] &quot;Labour Market Activity Survey Crosssectional Files&quot;                              
+## [17] &quot;Experienced Labour Force Population by Industry and Occupation custom tabulation&quot;
+## [18] &quot;Labour Market Activity Survey Longitudinal Files&quot;                                
+## [19] &quot;New Survey of London Life and Labour&quot;</code></pre>
+<p>We only need the Labour Force Surveys themselves. These are occasionally revised, <a href="https://www150.statcan.gc.ca/n1/pub/71f0031x/71f0031x2023001-eng.htm">documentation on these revisions here</a>, hence multiple records with slightly modified names (Labour Force Survey, Labour Force Survey (Rebased, Revised), etc)</p>
+<pre class="r"><code>lfs &lt;- labour[grepl(&quot;^Labour Force Survey&quot;, labour$name_no_year),] # regex to find names starting with LFS
+head(lfs)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:left;">
+description
+</th>
+<th style="text-align:right;">
+file_count
+</th>
+<th style="text-align:left;">
+producers
+</th>
+<th style="text-align:left;">
+pub_date
+</th>
+<th style="text-align:left;">
+handle
+</th>
+<th style="text-align:left;">
+global_id
+</th>
+<th style="text-align:left;">
+year
+</th>
+<th style="text-align:left;">
+name_no_year
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2013
+</td>
+<td style="text-align:left;">
+The Labour Force Survey (LFS) is a household…
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:left;">
+Statistics Canada. Labour Force Survey Division
+</td>
+<td style="text-align:left;">
+2013-09-10T07:00:00Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/HTSWUF" class="uri">https://hdl.handle.net/11272.1/AB2/HTSWUF</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/HTSWUF
+</td>
+<td style="text-align:left;">
+2013
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2014
+</td>
+<td style="text-align:left;">
+The Labour Force Survey (LFS) is a household…
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:left;">
+Statistics Canada. Labour Force Survey Division
+</td>
+<td style="text-align:left;">
+2014-01-01T08:00:00Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/SDAVTH" class="uri">https://hdl.handle.net/11272.1/AB2/SDAVTH</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/SDAVTH
+</td>
+<td style="text-align:left;">
+2014
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2023
+</td>
+<td style="text-align:left;">
+LFS data are used to produce the well-known …
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2024-01-05T17:38:25Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/IJU1QK" class="uri">https://hdl.handle.net/11272.1/AB2/IJU1QK</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/IJU1QK
+</td>
+<td style="text-align:left;">
+2023
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2006
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:47:04Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/0B5LPL" class="uri">https://hdl.handle.net/11272.1/AB2/0B5LPL</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/0B5LPL
+</td>
+<td style="text-align:left;">
+2006
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2008
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:47:20Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/LA3WXI" class="uri">https://hdl.handle.net/11272.1/AB2/LA3WXI</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/LA3WXI
+</td>
+<td style="text-align:left;">
+2008
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Labour Force Survey, 2007
+</td>
+<td style="text-align:left;">
+The Labour Force Survey provides estimates o…
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:left;">
+Statistics Canada
+</td>
+<td style="text-align:left;">
+2023-03-16T21:29:41Z
+</td>
+<td style="text-align:left;">
+<a href="https://hdl.handle.net/11272.1/AB2/NANO81" class="uri">https://hdl.handle.net/11272.1/AB2/NANO81</a>
+</td>
+<td style="text-align:left;">
+hdl:11272.1/AB2/NANO81
+</td>
+<td style="text-align:left;">
+2007
+</td>
+<td style="text-align:left;">
+Labour Force Survey
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="looking-at-files" class="section level2">
+<h2>Looking at Files</h2>
+<p>We now know the data sets we’re interested in. A dataset is made up of multiple files, however, and we likely don’t want all the files for every dataset. We’ll start by getting the file list for one of our datasets. Once we can do this for one dataset, we can iterate over all the datasets, although we won’t implement that in this workshop.</p>
+<p>Up until now, we’ve been using the <code>search</code> api. We’ll now use the <code>datasets</code> api.</p>
+<pre class="r"><code>datasets_api &lt;- &quot;datasets/&quot;</code></pre>
+<p>Like before, we’ll build our query. We’ll start with the 2011 LFS dataset. This is a multi-step process, as the first thing we need to do is get the <code>id</code> for the dataset, which is different from the <code>global_id</code> we retrieved from the <code>search</code> api, but we need the <code>global_id</code>, piped into the <code>datasets</code> api, to get the <code>id</code>.</p>
+<pre class="r"><code>id &lt;- lfs[lfs$name == &quot;Labour Force Survey, 2011&quot;, &quot;global_id&quot;, drop = TRUE] # we want a simple vector returned
+query &lt;- paste0(&quot;:persistentId/?persistentId=&quot;, id) # limit to the id of interest, see dataverse API documentation
+(dataset_api_call &lt;- paste0(base_url, datasets_api, query)) # build the call</code></pre>
+<pre><code>## [1] &quot;https://abacus.library.ubc.ca/api/datasets/:persistentId/?persistentId=hdl:11272.1/AB2/GK3SFF&quot;</code></pre>
+<p>Now we make the call and process the <code>body</code>.</p>
+<pre class="r"><code>dataset_id_resp &lt;- dataset_api_call |&gt;
+  httr2::request() |&gt;
+  httr2::req_perform()
+dataset_id_body &lt;- jsonlite::fromJSON(rawToChar(dataset_id_resp$body))</code></pre>
+<p>We need the <code>id</code> and the <code>versionNumber</code> to access a file list.</p>
+<p>Building the call:</p>
+<pre class="r"><code>dataset_id &lt;- dataset_id_body$data$id
+dataset_ver &lt;- dataset_id_body$data$latestVersion$versionNumber
+(file_list_query &lt;- paste0(base_url, datasets_api, dataset_id, &quot;/versions/&quot;, dataset_ver, &quot;/files/&quot;))</code></pre>
+<pre><code>## [1] &quot;https://abacus.library.ubc.ca/api/datasets/45508/versions/2/files/&quot;</code></pre>
+<p>Then execute, this time using the <code>httr2</code> option, <code>resp_body_json()</code> to convert the body to an <code>R</code> object, as it’s a bit more streamlined.</p>
+<pre class="r"><code>dataset_file_resp &lt;- file_list_query |&gt;
+  httr2::request() |&gt;
+  httr2::req_perform() |&gt;
+  httr2::resp_body_json()</code></pre>
+<p>Files are generally indicated as being either data, documentation, or command files. We’ll isolate just the data files in the list. All relevant data files have a <code>directoryLabel</code> equal to <code>Data</code>. We can use this to access only the data files.</p>
+<pre class="r"><code>data_files &lt;- Filter(function(x) x$directoryLabel == &quot;Data&quot;, dataset_file_resp$data) # filter by directoryLabel</code></pre>
+<p>We’ll list out the files</p>
+<pre class="r"><code>for(i in 1:length(data_files)){
+  print(data_files[[i]]$label)
+}</code></pre>
+<pre><code>## [1] &quot;LFS_April_2011.tab&quot;
+## [1] &quot;LFS_August_2011.tab&quot;
+## [1] &quot;LFS_December_2011.tab&quot;
+## [1] &quot;LFS_February_2011.tab&quot;
+## [1] &quot;LFS_January_2011.tab&quot;
+## [1] &quot;LFS_July_2011.tab&quot;
+## [1] &quot;LFS_June_2011.tab&quot;
+## [1] &quot;LFS_March_2011.tab&quot;
+## [1] &quot;LFS_May_2011.tab&quot;
+## [1] &quot;LFS_November_2011.tab&quot;
+## [1] &quot;LFS_October_2011.tab&quot;
+## [1] &quot;LFS_September_2011.tab&quot;
+## [1] &quot;pub0111.prn&quot;
+## [1] &quot;pub0211.prn&quot;
+## [1] &quot;pub0311.prn&quot;
+## [1] &quot;pub0411.prn&quot;
+## [1] &quot;pub0511.prn&quot;
+## [1] &quot;pub0611.prn&quot;
+## [1] &quot;pub0711.prn&quot;
+## [1] &quot;pub0811.prn&quot;
+## [1] &quot;pub0911.prn&quot;
+## [1] &quot;pub1011.prn&quot;
+## [1] &quot;pub1111.prn&quot;
+## [1] &quot;pub1211.prn&quot;</code></pre>
+<p>From which we’ll see that there are two different formats available to us. Let’s grab just the <code>.tab</code> files.</p>
+<pre class="r"><code>relevant_data_files &lt;- Filter(function(x) grepl(&quot;tab$&quot;, x$label), data_files) # filter to files ending in tab</code></pre>
+<p>And then download them.</p>
+<pre class="r"><code>dir.create(&quot;LFS_2011&quot;) # create a directory</code></pre>
+<pre><code>## Warning in dir.create(&quot;LFS_2011&quot;): &#39;LFS_2011&#39; already exists</code></pre>
+<pre class="r"><code>dest_dir &lt;- &quot;LFS_2011/&quot; # store it in a variable
+
+# loop through the files and download them
+for(i in 1:length(relevant_data_files)){
+  file_name &lt;- relevant_data_files[[i]]$label
+  file_id &lt;- relevant_data_files[[i]]$dataFile$id
+  url_root &lt;- &quot;https://abacus.library.ubc.ca/api/access/datafile/&quot;
+  download.file(url = paste0(url_root, file_id), destfile = paste0(dest_dir, file_name))
+}</code></pre>
+<p>And build an annual set</p>
+<pre class="r"><code>lfs_2011_list &lt;- lapply(list.files(dest_dir), function(x) read.delim(file = paste0(dest_dir, x))) # read in each tab file into a list
+lfs_2011_df &lt;- do.call(rbind, lfs_2011_list) # bind the list items into a df
+summary(lfs_2011_df[, c(1:11)]) |&gt;
+  kbl() |&gt;
+  kable_styling(bootstrap_options = &quot;striped&quot;)</code></pre>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+REC_NUM
+</th>
+<th style="text-align:left;">
+SURVYEAR
+</th>
+<th style="text-align:left;">
+SURVMNTH
+</th>
+<th style="text-align:left;">
+LFSSTAT
+</th>
+<th style="text-align:left;">
+PROV
+</th>
+<th style="text-align:left;">
+CMA
+</th>
+<th style="text-align:left;">
+AGE_12
+</th>
+<th style="text-align:left;">
+AGE_6
+</th>
+<th style="text-align:left;">
+SEX
+</th>
+<th style="text-align:left;">
+MARSTAT
+</th>
+<th style="text-align:left;">
+EDUC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Min. : 1
+</td>
+<td style="text-align:left;">
+Min. :2011
+</td>
+<td style="text-align:left;">
+Min. : 1.000
+</td>
+<td style="text-align:left;">
+Min. :1.00
+</td>
+<td style="text-align:left;">
+Min. :10.0
+</td>
+<td style="text-align:left;">
+Min. :0.000
+</td>
+<td style="text-align:left;">
+Min. : 1.000
+</td>
+<td style="text-align:left;">
+Min. :1.0
+</td>
+<td style="text-align:left;">
+Min. :1.000
+</td>
+<td style="text-align:left;">
+Min. :1.000
+</td>
+<td style="text-align:left;">
+Min. :0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+1st Qu.: 26294
+</td>
+<td style="text-align:left;">
+1st Qu.:2011
+</td>
+<td style="text-align:left;">
+1st Qu.: 4.000
+</td>
+<td style="text-align:left;">
+1st Qu.:1.00
+</td>
+<td style="text-align:left;">
+1st Qu.:24.0
+</td>
+<td style="text-align:left;">
+1st Qu.:0.000
+</td>
+<td style="text-align:left;">
+1st Qu.: 4.000
+</td>
+<td style="text-align:left;">
+1st Qu.:2.0
+</td>
+<td style="text-align:left;">
+1st Qu.:1.000
+</td>
+<td style="text-align:left;">
+1st Qu.:1.000
+</td>
+<td style="text-align:left;">
+1st Qu.:2.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Median : 52587
+</td>
+<td style="text-align:left;">
+Median :2011
+</td>
+<td style="text-align:left;">
+Median : 7.000
+</td>
+<td style="text-align:left;">
+Median :1.00
+</td>
+<td style="text-align:left;">
+Median :35.0
+</td>
+<td style="text-align:left;">
+Median :0.000
+</td>
+<td style="text-align:left;">
+Median : 7.000
+</td>
+<td style="text-align:left;">
+Median :4.0
+</td>
+<td style="text-align:left;">
+Median :2.000
+</td>
+<td style="text-align:left;">
+Median :2.000
+</td>
+<td style="text-align:left;">
+Median :3.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Mean : 52589
+</td>
+<td style="text-align:left;">
+Mean :2011
+</td>
+<td style="text-align:left;">
+Mean : 6.509
+</td>
+<td style="text-align:left;">
+Mean :2.19
+</td>
+<td style="text-align:left;">
+Mean :35.1
+</td>
+<td style="text-align:left;">
+Mean :1.473
+</td>
+<td style="text-align:left;">
+Mean : 6.765
+</td>
+<td style="text-align:left;">
+Mean :3.5
+</td>
+<td style="text-align:left;">
+Mean :1.516
+</td>
+<td style="text-align:left;">
+Mean :2.834
+</td>
+<td style="text-align:left;">
+Mean :3.008
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+3rd Qu.: 78880
+</td>
+<td style="text-align:left;">
+3rd Qu.:2011
+</td>
+<td style="text-align:left;">
+3rd Qu.: 9.000
+</td>
+<td style="text-align:left;">
+3rd Qu.:4.00
+</td>
+<td style="text-align:left;">
+3rd Qu.:47.0
+</td>
+<td style="text-align:left;">
+3rd Qu.:2.000
+</td>
+<td style="text-align:left;">
+3rd Qu.:10.000
+</td>
+<td style="text-align:left;">
+3rd Qu.:5.0
+</td>
+<td style="text-align:left;">
+3rd Qu.:2.000
+</td>
+<td style="text-align:left;">
+3rd Qu.:6.000
+</td>
+<td style="text-align:left;">
+3rd Qu.:4.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+Max. :106352
+</td>
+<td style="text-align:left;">
+Max. :2011
+</td>
+<td style="text-align:left;">
+Max. :12.000
+</td>
+<td style="text-align:left;">
+Max. :4.00
+</td>
+<td style="text-align:left;">
+Max. :59.0
+</td>
+<td style="text-align:left;">
+Max. :9.000
+</td>
+<td style="text-align:left;">
+Max. :12.000
+</td>
+<td style="text-align:left;">
+Max. :6.0
+</td>
+<td style="text-align:left;">
+Max. :2.000
+</td>
+<td style="text-align:left;">
+Max. :6.000
+</td>
+<td style="text-align:left;">
+Max. :6.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA’s :975211
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
+</div>
