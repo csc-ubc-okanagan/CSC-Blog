@@ -4,40 +4,61 @@ date: '2023-08-01 09:00:00 -0800'
 categories: [R, R_Modelling]
 tags: [R, modelling] # tags always lowercase
 author: Madison
-output: 
-  html_document:
-    keep_md: TRUE
+output: rmarkdown::md_document
+hugo: true
 ---
 
 
 
-<p>In previous categories we have looked at cleaning, summarizing, and subsetting data, with some minor calculations, but we haven’t yet looked at analyzing our data.</p>
-<p>R is a very powerful tool for data analysis. We can fit linear models and view graphs. First, we will look at some basic data analysis processes in R.</p>
-<p>Let’s re-load in our Gapminder data:</p>
-<pre class="r"><code>link &lt;- &#39;https://raw.githubusercontent.com/jstaf/gapminder/master/gapminder/gapminder.csv&#39;
-df &lt;- read.csv(url(link))
-head(df)</code></pre>
-<pre><code>##       country continent year lifeExp      pop gdpPercap
+In previous categories we have looked at cleaning, summarizing, and subsetting data, with some minor calculations, but we haven’t yet looked at analyzing our data.
+
+R is a very powerful tool for data analysis. We can fit linear models and view graphs. First, we will look at some basic data analysis processes in R.
+
+Let’s re-load in our Gapminder data:
+
+
+``` r
+link <- 'https://raw.githubusercontent.com/jstaf/gapminder/master/gapminder/gapminder.csv'
+df <- read.csv(url(link))
+head(df)
+```
+
+```
+##       country continent year lifeExp      pop gdpPercap
 ## 1 Afghanistan      Asia 1952  28.801  8425333  779.4453
 ## 2 Afghanistan      Asia 1957  30.332  9240934  820.8530
 ## 3 Afghanistan      Asia 1962  31.997 10267083  853.1007
 ## 4 Afghanistan      Asia 1967  34.020 11537966  836.1971
 ## 5 Afghanistan      Asia 1972  36.088 13079460  739.9811
-## 6 Afghanistan      Asia 1977  38.438 14880372  786.1134</code></pre>
-<div id="linear-modelling" class="section level1">
-<h1>Linear Modelling</h1>
-<p>Let’s say we want to fit a linear model to see if there is a relationship between population and time. First, let’s do this with the entire dataset with all countries.</p>
-<p>We know that there is Simple Linear Regression (SLR) and Multiple Linear Regression (MLR). See the pseudocode below for a layout on how to form both in R.</p>
-<pre class="r"><code># Simple Linear Regression
-# model_name &lt;- lm(Y ~ X, data = dataframe)
+## 6 Afghanistan      Asia 1977  38.438 14880372  786.1134
+```
+
+# Linear Modelling
+
+Let’s say we want to fit a linear model to see if there is a relationship between population and time. First, let’s do this with the entire dataset with all countries. 
+
+We know that there is Simple Linear Regression (SLR) and Multiple Linear Regression (MLR). See the pseudocode below for a layout on how to form both in R.
+
+
+``` r
+# Simple Linear Regression
+# model_name <- lm(Y ~ X, data = dataframe)
 
 # Multiple Linear Regression
-# model_name &lt;- lm(Y ~ X1 + X2 + ..., data = dataframe)
-# model_name &lt;- lm(Y ~ ., data = dataframe) to use all variables except Y</code></pre>
-<p>Now that we have the layout of the code down, let’s use Y as population and X as year for an SLR model.</p>
-<pre class="r"><code>model1 &lt;- lm(pop ~ year, data = df)
-summary(model1)</code></pre>
-<pre><code>## 
+# model_name <- lm(Y ~ X1 + X2 + ..., data = dataframe)
+# model_name <- lm(Y ~ ., data = dataframe) to use all variables except Y
+```
+
+Now that we have the layout of the code down, let's use Y as population and X as year for an SLR model.
+
+
+``` r
+model1 <- lm(pop ~ year, data = df)
+summary(model1)
+```
+
+```
+## 
 ## Call:
 ## lm(formula = pop ~ year, data = df)
 ## 
@@ -46,19 +67,26 @@ summary(model1)</code></pre>
 ##  -43318856  -27548179  -18558743   -9628265 1275164661 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
+##               Estimate Std. Error t value Pr(>|t|)    
 ## (Intercept) -972185807  294031308  -3.306 0.000965 ***
 ## year            506081     148532   3.407 0.000672 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 105800000 on 1702 degrees of freedom
 ## Multiple R-squared:  0.006775,	Adjusted R-squared:  0.006191 
-## F-statistic: 11.61 on 1 and 1702 DF,  p-value: 0.0006716</code></pre>
-<p>Now, let’s perform MLR with two variables, year and lifeExp.</p>
-<pre class="r"><code>model2 &lt;- lm(pop ~ year + lifeExp, data = df)
-summary(model2)</code></pre>
-<pre><code>## 
+## F-statistic: 11.61 on 1 and 1702 DF,  p-value: 0.0006716
+```
+Now, let's perform MLR with two variables, year and lifeExp.
+
+
+``` r
+model2 <- lm(pop ~ year + lifeExp, data = df)
+summary(model2)
+```
+
+```
+## 
 ## Call:
 ## lm(formula = pop ~ year + lifeExp, data = df)
 ## 
@@ -67,20 +95,28 @@ summary(model2)</code></pre>
 ##  -47148304  -27382074  -18454446   -8444157 1273829226 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)  
+##               Estimate Std. Error t value Pr(>|t|)  
 ## (Intercept) -799315581  321078589  -2.489   0.0129 *
 ## year            409882     164973   2.485   0.0131 *
 ## lifeExp         295176     220507   1.339   0.1809  
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 105800000 on 1701 degrees of freedom
 ## Multiple R-squared:  0.00782,	Adjusted R-squared:  0.006653 
-## F-statistic: 6.703 on 2 and 1701 DF,  p-value: 0.00126</code></pre>
-<p>Finally, let’s perform MLR with all variables in the dataset.</p>
-<pre class="r"><code>model3 &lt;- lm(pop ~ ., data = df)
-summary(model3)</code></pre>
-<pre><code>## 
+## F-statistic: 6.703 on 2 and 1701 DF,  p-value: 0.00126
+```
+
+Finally, let's perform MLR with all variables in the dataset.
+
+
+``` r
+model3 <- lm(pop ~ ., data = df)
+summary(model3)
+```
+
+```
+## 
 ## Call:
 ## lm(formula = pop ~ ., data = df)
 ## 
@@ -89,7 +125,7 @@ summary(model3)</code></pre>
 ## -375691051   -5548380    -604356    4854327  391492520 
 ## 
 ## Coefficients: (4 not defined because of singularities)
-##                                   Estimate Std. Error t value Pr(&gt;|t|)    
+##                                   Estimate Std. Error t value Pr(>|t|)    
 ## (Intercept)                     -2.211e+08  1.677e+08  -1.319 0.187435    
 ## countryAlbania                  -5.423e+07  1.431e+07  -3.789 0.000157 ***
 ## countryAlgeria                  -2.412e+07  1.347e+07  -1.790 0.073575 .  
@@ -114,13 +150,13 @@ summary(model3)</code></pre>
 ## countryCentral African Republic -2.179e+07  1.266e+07  -1.722 0.085353 .  
 ## countryChad                     -2.287e+07  1.274e+07  -1.795 0.072860 .  
 ## countryChile                    -4.360e+07  1.427e+07  -3.056 0.002279 ** 
-## countryChina                     9.099e+08  1.366e+07  66.602  &lt; 2e-16 ***
+## countryChina                     9.099e+08  1.366e+07  66.602  < 2e-16 ***
 ## countryColombia                 -2.330e+07  1.388e+07  -1.679 0.093446 .  
 ## countryComoros                  -3.532e+07  1.300e+07  -2.718 0.006646 ** 
 ## countryCongo, Dem. Rep.          7.368e+06  1.267e+07   0.581 0.561055    
 ## countryCongo, Rep.              -3.354e+07  1.302e+07  -2.576 0.010080 *  
 ## countryCosta Rica               -5.633e+07  1.453e+07  -3.876 0.000111 ***
-## countryCote d&#39;Ivoire            -2.113e+07  1.281e+07  -1.650 0.099208 .  
+## countryCote d'Ivoire            -2.113e+07  1.281e+07  -1.650 0.099208 .  
 ## countryCroatia                  -5.353e+07  1.460e+07  -3.666 0.000255 ***
 ## countryCuba                     -5.049e+07  1.464e+07  -3.448 0.000580 ***
 ## countryCzech Republic           -4.891e+07  1.490e+07  -3.283 0.001050 ** 
@@ -148,8 +184,8 @@ summary(model3)</code></pre>
 ## countryHong Kong, China         -5.631e+07  1.521e+07  -3.703 0.000220 ***
 ## countryHungary                  -4.642e+07  1.457e+07  -3.186 0.001473 ** 
 ## countryIceland                  -6.410e+07  1.575e+07  -4.071 4.91e-05 ***
-## countryIndia                     6.643e+08  1.304e+07  50.949  &lt; 2e-16 ***
-## countryIndonesia                 1.101e+08  1.311e+07   8.396  &lt; 2e-16 ***
+## countryIndia                     6.643e+08  1.304e+07  50.949  < 2e-16 ***
+## countryIndonesia                 1.101e+08  1.311e+07   8.396  < 2e-16 ***
 ## countryIran                     -6.002e+05  1.349e+07  -0.045 0.964511    
 ## countryIraq                     -2.588e+07  1.334e+07  -1.939 0.052645 .  
 ## countryIreland                  -5.722e+07  1.513e+07  -3.781 0.000162 ***
@@ -224,7 +260,7 @@ summary(model3)</code></pre>
 ## countryTurkey                    1.033e+06  1.352e+07   0.076 0.939115    
 ## countryUganda                   -1.504e+07  1.277e+07  -1.178 0.239162    
 ## countryUnited Kingdom           -4.993e+06  1.538e+07  -0.325 0.745519    
-## countryUnited States             1.690e+08  1.566e+07  10.794  &lt; 2e-16 ***
+## countryUnited States             1.690e+08  1.566e+07  10.794  < 2e-16 ***
 ## countryUruguay                  -5.631e+07  1.463e+07  -3.848 0.000124 ***
 ## countryVenezuela                -3.789e+07  1.426e+07  -2.658 0.007945 ** 
 ## countryVietnam                   1.200e+07  1.332e+07   0.901 0.367650    
@@ -240,10 +276,12 @@ summary(model3)</code></pre>
 ## lifeExp                          1.339e+06  2.189e+05   6.118 1.19e-09 ***
 ## gdpPercap                       -1.908e+02  1.655e+02  -1.153 0.248975    
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 30810000 on 1559 degrees of freedom
 ## Multiple R-squared:  0.9229,	Adjusted R-squared:  0.9158 
-## F-statistic: 129.6 on 144 and 1559 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>Note that the outputs give us a lot of information. We see the default hypotheses tested, with p-values for each coefficient and for the model as a whole. We see the RSE and the degrees of freedom, F-test, R-squared values, and much more! There are a lot of insights that we can extract from this simple output.</p>
-</div>
+## F-statistic: 129.6 on 144 and 1559 DF,  p-value: < 2.2e-16
+```
+
+
+Note that the outputs give us a lot of information. We see the default hypotheses tested, with p-values for each coefficient and for the model as a whole. We see the RSE and the degrees of freedom, F-test, R-squared values, and much more! There are a lot of insights that we can extract from this simple output.
