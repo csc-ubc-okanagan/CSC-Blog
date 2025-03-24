@@ -9,23 +9,32 @@ output:
     keep_md: TRUE
 ---
 
+In previous categories we have looked at cleaning, summarizing, and subsetting data, with some minor calculations, but we haven’t yet looked at analyzing our data.
 
+Python is a very powerful tool for data analysis. Similarly to R, we can fit linear models and view graphs. First, we will look at some basic data analysis processes in Python.
 
-<p>In previous categories we have looked at cleaning, summarizing, and subsetting data, with some minor calculations, but we haven’t yet looked at analyzing our data.</p>
-<p>Python is a very powerful tool for data analysis. Similarly to R, we can fit linear models and view graphs. First, we will look at some basic data analysis processes in Python.</p>
-<p>Let’s re-load in our Gapminder data:</p>
-<pre class="python"><code>import pandas as pd
-url = &#39;https://raw.githubusercontent.com/jstaf/gapminder/master/gapminder/gapminder.csv&#39;
-df = pd.read_csv(url)</code></pre>
-<p>Let’s say we want to fit a linear model to see if there is a relationship between population and time. First, let’s do this with the entire dataset with all countries.</p>
-<p>Note that OLS stands for ordinary least squares.</p>
-<pre class="python"><code>import statsmodels.api as sm
+Let’s re-load in our Gapminder data:
+
+``` python
+import pandas as pd
+url = 'https://raw.githubusercontent.com/jstaf/gapminder/master/gapminder/gapminder.csv'
+df = pd.read_csv(url)
+```
+
+Let’s say we want to fit a linear model to see if there is a relationship between population and time. First, let’s do this with the entire dataset with all countries.
+
+Note that OLS stands for ordinary least squares.
+
+``` python
+import statsmodels.api as sm
 # define our x and y variables for clarity
-y = df[&#39;pop&#39;]
-x = df[&#39;year&#39;]
+y = df['pop']
+x = df['year']
 x = sm.add_constant(x)
 model = sm.OLS(y,x).fit()
-model.summary()</code></pre>
+model.summary()
+```
+
 <table class="simpletable">
 <caption>OLS Regression Results</caption>
 <tr>
@@ -38,10 +47,10 @@ model.summary()</code></pre>
   <th>Method:</th>             <td>Least Squares</td>  <th>  F-statistic:       </th> <td>   11.61</td> 
 </tr>
 <tr>
-  <th>Date:</th>             <td>Sun, 16 Mar 2025</td> <th>  Prob (F-statistic):</th> <td>0.000672</td> 
+  <th>Date:</th>             <td>Mon, 24 Mar 2025</td> <th>  Prob (F-statistic):</th> <td>0.000672</td> 
 </tr>
 <tr>
-  <th>Time:</th>                 <td>16:59:26</td>     <th>  Log-Likelihood:    </th> <td> -33902.</td> 
+  <th>Time:</th>                 <td>16:47:02</td>     <th>  Log-Likelihood:    </th> <td> -33902.</td> 
 </tr>
 <tr>
   <th>No. Observations:</th>      <td>  1704</td>      <th>  AIC:               </th> <td>6.781e+04</td>
@@ -81,20 +90,29 @@ model.summary()</code></pre>
   <th>Kurtosis:</th>       <td>79.807</td>  <th>  Cond. No.          </th>  <td>2.27e+05</td> 
 </tr>
 </table><br/><br/>Notes:<br/>[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.<br/>[2] The condition number is large, 2.27e+05. This might indicate that there are<br/>strong multicollinearity or other numerical problems.
-<p>Let’s try fitting another linear model, but using only data from Africa.</p>
-<pre class="python"><code>df_AF = df[df[&#39;continent&#39;] == &#39;Africa&#39;]
-df_AF.head()</code></pre>
-<pre><code>##     country continent  year  lifeExp       pop    gdpPercap
-## 24  Algeria    Africa  1952   43.077   9279525  2449.008185
-## 25  Algeria    Africa  1957   45.685  10270856  3013.976023
-## 26  Algeria    Africa  1962   48.303  11000948  2550.816880
-## 27  Algeria    Africa  1967   51.407  12760499  3246.991771
-## 28  Algeria    Africa  1972   54.518  14760787  4182.663766</code></pre>
-<pre class="python"><code>y = df_AF[&#39;pop&#39;]
-x = df_AF[&#39;year&#39;]
+
+Let’s try fitting another linear model, but using only data from Africa.
+
+``` python
+df_AF = df[df['continent'] == 'Africa']
+df_AF.head()
+```
+
+    ##     country continent  year  lifeExp       pop    gdpPercap
+    ## 24  Algeria    Africa  1952   43.077   9279525  2449.008185
+    ## 25  Algeria    Africa  1957   45.685  10270856  3013.976023
+    ## 26  Algeria    Africa  1962   48.303  11000948  2550.816880
+    ## 27  Algeria    Africa  1967   51.407  12760499  3246.991771
+    ## 28  Algeria    Africa  1972   54.518  14760787  4182.663766
+
+``` python
+y = df_AF['pop']
+x = df_AF['year']
 x = sm.add_constant(x)
 model1 = sm.OLS(y,x).fit()
-model1.summary()</code></pre>
+model1.summary()
+```
+
 <table class="simpletable">
 <caption>OLS Regression Results</caption>
 <tr>
@@ -107,10 +125,10 @@ model1.summary()</code></pre>
   <th>Method:</th>             <td>Least Squares</td>  <th>  F-statistic:       </th> <td>   49.66</td> 
 </tr>
 <tr>
-  <th>Date:</th>             <td>Sun, 16 Mar 2025</td> <th>  Prob (F-statistic):</th> <td>4.87e-12</td> 
+  <th>Date:</th>             <td>Mon, 24 Mar 2025</td> <th>  Prob (F-statistic):</th> <td>4.87e-12</td> 
 </tr>
 <tr>
-  <th>Time:</th>                 <td>16:59:26</td>     <th>  Log-Likelihood:    </th> <td> -11192.</td> 
+  <th>Time:</th>                 <td>16:47:02</td>     <th>  Log-Likelihood:    </th> <td> -11192.</td> 
 </tr>
 <tr>
   <th>No. Observations:</th>      <td>   624</td>      <th>  AIC:               </th> <td>2.239e+04</td>
