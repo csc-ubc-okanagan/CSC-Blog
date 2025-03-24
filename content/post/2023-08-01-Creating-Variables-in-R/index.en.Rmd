@@ -3,7 +3,7 @@ title: Creating Variables in R
 date: '2023-08-01 09:00:00 -0800'
 categories: [R, R_Data]
 tags: [R, cleaning] # tags always lowercase
-author: Madison
+author: Madison 
 math: yes
 output:
   html_document:
