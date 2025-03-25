@@ -4,9 +4,7 @@ date: '2023-06-15 09:00:00 -0800'
 categories: [Python, P_Visualization]
 tags: [python] # tags always lowercase
 author: madison
-output: 
-  html_document:
-    keep_md: TRUE
+
 ---
 
 Matplotlib is a standard package used in Python for plotting. This is a basic plotting package, but does have limitations.
