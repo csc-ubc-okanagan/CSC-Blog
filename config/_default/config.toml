@@ -1,5 +1,5 @@
 # Change baseurl before deploy
-baseurl = "https://csc-ubc-okanagan.github.io/CSC-Blog/"
+baseurl = "https://csc-ubc-okanagan.github.io/csc-data-blog/"
 languageCode = "en-us"
 title = "R & Python Blog"
 copyright = "Center for Scholarly Communication, UBC Okanagan"
