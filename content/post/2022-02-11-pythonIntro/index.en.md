@@ -3,10 +3,12 @@ title: Introduction to Python
 date: '2023-02-15 09:00:00 -0800'
 categories: [Python, P_Getting Started]
 tags: [python] # tags always lowercase
-author: Madison
+author: madison
 output: 
   html_document:
     keep_md: TRUE
+    includes:
+      in_header: googleAnalytics.html
 ---
 
 
