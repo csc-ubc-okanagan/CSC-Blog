@@ -20,4 +20,6 @@ pagerSize = 6
 	
 [params.article]
 math = true
+
+googleAnalytics = "G-PQ1KG9NWP0"
 	
