@@ -21,5 +21,7 @@ pagerSize = 6
 [params.article]
 math = true
 
-googleAnalytics = "G-PQ1KG9NWP0"
+[services]
+  [services.googleAnalytics]
+    googleAnalytics = 'G-PQ1KG9NWP0'
 	
