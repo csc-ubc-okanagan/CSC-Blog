@@ -24,16 +24,15 @@
 {{ end }}
 
 {{ define "main" }}
-    {{ partial "article/article.html" . }}
-
-    <!-- Display the front-matter author, if any -->
+ <!-- Display the front-matter author, if any -->
     {{ if .Params.author }}
-      <p>
-        <strong>By:</strong> {{ .Params.author }}
+      <p class = "authorName">
+        By: {{ .Params.author }}
       </p>
     {{ else }}
       <p><em>No author specified in front matter</em></p>
     {{ end }}
+    {{ partial "article/article.html" . }}
 
     {{ if .Params.links }}
         {{ partial "article/components/links" . }}
