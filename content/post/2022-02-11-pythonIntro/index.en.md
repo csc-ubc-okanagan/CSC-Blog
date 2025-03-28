@@ -7,8 +7,6 @@ author: madison
 output: 
   html_document:
     keep_md: TRUE
-    includes:
-      in_header: googleAnalytics.html
 ---
 
 
